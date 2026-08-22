@@ -19,6 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from statistics import mean, median
 
+from .dates import previous_trading_day
 from .metrics import forward_return
 from .screen import ScreenConfig, run_screen
 
@@ -47,6 +48,9 @@ def backtest(
 ) -> list[PeriodResult]:
     cfg = cfg or ScreenConfig()
     results = []
+
+    # A rebalance date on a weekend silently shifts every window.
+    dates = [previous_trading_day(d) for d in dates]
 
     for as_of in dates:
         screen = run_screen(provider, as_of, cfg)

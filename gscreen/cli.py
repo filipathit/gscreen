@@ -21,6 +21,7 @@ import json
 from pathlib import Path
 
 from .backtest import backtest, report
+from .dates import resolve_as_of
 from .llm import build_prompt, call_model, parse_response, validate_grounding
 from .providers import PRESETS, SOURCES, build_provider
 from .screen import ScreenConfig, run_screen
@@ -104,7 +105,9 @@ def main() -> None:
     parser.add_argument("--universe", choices=SOURCES["universe"])
     parser.add_argument("--prices", choices=SOURCES["prices"])
     parser.add_argument("--fundamentals", choices=SOURCES["fundamentals"])
-    parser.add_argument("--as-of", default="2026-08-15")
+    parser.add_argument(
+        "--as-of", default=None, help="defaults to the last trading day"
+    )
     parser.add_argument("--limit", type=int, default=None, help="cap the universe size")
     parser.add_argument("--llm", action="store_true")
     parser.add_argument("--json", action="store_true")
@@ -122,6 +125,11 @@ def main() -> None:
         for capability, options in SOURCES.items():
             print(f"{capability:<13} {' | '.join(options)}")
         return
+
+    as_of, note = resolve_as_of(args.as_of)
+    args.as_of = as_of
+    if note:
+        print(f"note: {note}")
 
     if args.command == "doctor":
         doctor(args)

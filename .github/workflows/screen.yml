@@ -76,7 +76,7 @@ jobs:
           {
             echo '## Source check'
             echo '```'
-            PYTHONPATH=. python -m gscreen.cli doctor --as-of "$(date -u +%F)" 2>&1
+            PYTHONPATH=. python -m gscreen.cli doctor 2>&1
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
@@ -88,7 +88,10 @@ jobs:
           SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT || 'gscreen research script' }}
         run: |
           set -o pipefail
-          DATE=$(date -u +%F)
+          # Let the library resolve the trading day so the filename and the
+          # screen's as_of cannot disagree.
+          DATE=$(PYTHONPATH=. python -c "from gscreen.dates import resolve_as_of; print(resolve_as_of()[0])")
+          echo "resolved trading day: $DATE"
           mkdir -p results
           LLM=""
           if [ "${{ inputs.use_llm }}" = "true" ] && [ -n "$ANTHROPIC_API_KEY" ]; then

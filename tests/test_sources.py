@@ -254,3 +254,37 @@ def test_short_history_rejection_states_what_it_got():
     reasons = [r.reason for r in result.rejections if r.stage == "momentum"]
     assert reasons
     assert all("30 rows" in r and "274" in r for r in reasons)
+
+
+# --------------------------------------------------------------------------
+# as_of must land on a trading day
+# --------------------------------------------------------------------------
+
+
+def test_weekend_as_of_snaps_back_to_friday():
+    from gscreen.dates import resolve_as_of
+
+    as_of, note = resolve_as_of("2026-08-22")  # a Saturday
+    assert as_of == "2026-08-21"
+    assert "weekend" in note
+
+    as_of, note = resolve_as_of("2026-08-23")  # a Sunday
+    assert as_of == "2026-08-21"
+
+
+def test_weekday_as_of_is_left_alone():
+    from gscreen.dates import resolve_as_of
+
+    as_of, note = resolve_as_of("2026-08-21")  # a Friday
+    assert as_of == "2026-08-21"
+    assert note is None
+
+
+def test_default_as_of_is_a_trading_day():
+    from datetime import date
+
+    from gscreen.dates import is_trading_day, resolve_as_of
+
+    for day in range(1, 29):
+        as_of, _ = resolve_as_of(None, today=date(2026, 8, day))
+        assert is_trading_day(as_of), day
