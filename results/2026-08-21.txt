@@ -1,61 +1,230 @@
-sources: universe=StaticUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True  universe_pit=False
+sources: universe=FramesUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True  universe_pit=False
 
-Screen as of 2026-08-21: 9 survivors
-  RDDT   cagr3y=  48.9% mom12-1=  15.8% qtrs=7 r40=  80.0% dilution=n/a
+Screen as of 2026-08-21: 26 survivors
+  SEZL   cagr3y= 170.2% mom12-1=  18.2% qtrs=8 r40= 258.9% dilution=   0.2%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  TARS   cagr3y= 159.5% mom12-1=  38.4% qtrs=6 r40= 154.6% dilution=   0.6%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  APLD   cagr3y= 156.5% mom12-1= 173.0% qtrs=4 r40=  76.4% dilution=   0.9%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  AXSM   cagr3y= 133.7% mom12-1= 135.5% qtrs=7 r40= 119.0% dilution=   1.7%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  ALAB   cagr3y= 120.2% mom12-1= 179.7% qtrs=8 r40= 153.2% dilution=   1.3%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  RYTM   cagr3y= 100.2% mom12-1=  16.9% qtrs=6 r40=  38.8% dilution=   0.5%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  CRDO   cagr3y=  93.5% mom12-1= 154.5% qtrs=6 r40= 124.0% dilution=   0.6%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  MIRM   cagr3y=  89.1% mom12-1= 119.1% qtrs=13 r40=  99.7% dilution=   6.3%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  BBIO   cagr3y=  86.3% mom12-1=  81.2% qtrs=4 r40=  -2.7% dilution=  -0.2%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  CTO    cagr3y=  83.0% mom12-1=  34.2% qtrs=4 r40=1245.5% dilution=   3.8%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  TVTX   cagr3y=  64.9% mom12-1= 261.9% qtrs=10 r40=  72.6% dilution=   1.4%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  OUST   cagr3y=  60.4% mom12-1=  37.7% qtrs=17 r40=  22.1% dilution=   7.9%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  FTAI   cagr3y=  52.4% mom12-1=  97.0% qtrs=7 r40=  38.9% dilution=   0.0%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  RDDT   cagr3y=  48.9% mom12-1=  15.8% qtrs=8 r40=  80.0% dilution=n/a
          untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
-  SNOW   cagr3y=  31.4% mom12-1=  24.9% qtrs=16 r40=  55.3% dilution=   0.8%
+  HUT    cagr3y=  47.2% mom12-1= 449.9% qtrs=4 r40= -12.0% dilution=   9.5%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
-  NET    cagr3y=  30.5% mom12-1=  37.7% qtrs=20 r40=  43.8% dilution=n/a
+  KNSA   cagr3y=  45.5% mom12-1= 128.1% qtrs=7 r40=  65.6% dilution=n/a
          untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
-  CRWD   cagr3y=  29.0% mom12-1=  55.7% qtrs=21 r40=  56.2% dilution=n/a
+  LMND   cagr3y=  42.2% mom12-1=  47.2% qtrs=15 r40=  38.7% dilution=   0.7%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  RKLB   cagr3y=  41.8% mom12-1=  49.3% qtrs=8 r40= -11.7% dilution=   3.9%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  NTRA   cagr3y=  41.1% mom12-1=  89.2% qtrs=23 r40=  45.9% dilution=   0.6%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  ASTH   cagr3y=  40.6% mom12-1=  78.5% qtrs=8 r40=  43.9% dilution=   0.0%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  DAVE   cagr3y=  39.3% mom12-1= 110.6% qtrs=14 r40=  91.6% dilution=n/a
          untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
-  ANET   cagr3y=  27.1% mom12-1=  60.9% qtrs=18 r40=  75.7% dilution=   0.2%
+  XERS   cagr3y=  38.3% mom12-1=  64.3% qtrs=5 r40=  48.1% dilution=   0.6%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
-  DDOG   cagr3y=  26.9% mom12-1=  68.7% qtrs=20 r40=  56.1% dilution=n/a
-         untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
-  AVGO   cagr3y=  24.4% mom12-1=  41.9% qtrs=8 r40=  66.5% dilution=   0.5%
+  CDE    cagr3y=  38.1% mom12-1=  59.4% qtrs=7 r40=  81.0% dilution=  -0.6%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
-  MDB    cagr3y=  24.3% mom12-1=  33.4% qtrs=21 r40=  44.6% dilution=   0.0%
+  RELY   cagr3y=  35.8% mom12-1=  32.7% qtrs=15 r40=  53.8% dilution=   0.6%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
-  VRT    cagr3y=  21.6% mom12-1= 142.9% qtrs=7 r40=  40.1% dilution=   0.3%
+  CURB   cagr3y=  35.7% mom12-1=  37.9% qtrs=5 r40= 103.9% dilution=   0.2%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
-Rejected: 39
-  ADBE   [momentum] 12-1 momentum  -43.1% below floor
-  APP    [momentum] 12-1 momentum   14.0% below floor
-  AXON   [momentum] 12-1 momentum  -31.8% below floor
-  CAVA   [momentum] 12-1 momentum  -29.7% below floor
-  CRM    [momentum] 12-1 momentum  -40.0% below floor
-  CRWV   [momentum] 12-1 momentum  -37.5% below floor
-  DKNG   [momentum] 12-1 momentum  -48.8% below floor
-  ELF    [momentum] 12-1 momentum  -34.4% below floor
-  HIMS   [momentum] 12-1 momentum  -34.5% below floor
-  HOOD   [momentum] 12-1 momentum   -0.3% below floor
-  INTU   [momentum] 12-1 momentum  -62.9% below floor
-  KVYO   [momentum] 12-1 momentum  -52.2% below floor
-  META   [momentum] 12-1 momentum  -13.7% below floor
-  MSFT   [momentum] 12-1 momentum  -23.9% below floor
-  MSTR   [momentum] 12-1 momentum  -78.0% below floor
-  NOW    [momentum] 12-1 momentum  -52.2% below floor
-  ONON   [momentum] 12-1 momentum  -30.8% below floor
-  ORCL   [momentum] 12-1 momentum  -49.0% below floor
-  PLTR   [momentum] 12-1 momentum  -17.2% below floor
-  RBLX   [momentum] 12-1 momentum  -60.4% below floor
-  RBRK   [momentum] 12-1 momentum  -13.3% below floor
-  S      [momentum] 12-1 momentum   -9.7% below floor
-  SHOP   [momentum] 12-1 momentum   -9.5% below floor
-  SPOT   [momentum] 12-1 momentum  -30.6% below floor
-  SQ     [momentum] need 274 daily closes for 12-1, got 0 rows
-  TEAM   [momentum] 12-1 momentum  -59.6% below floor
-  TOST   [momentum] 12-1 momentum  -40.4% below floor
-  TSLA   [momentum] 12-1 momentum   -3.7% below floor
-  TTD    [momentum] 12-1 momentum  -79.4% below floor
-  UBER   [momentum] 12-1 momentum  -24.9% below floor
-  WDAY   [momentum] 12-1 momentum  -46.5% below floor
-  ZS     [momentum] 12-1 momentum  -51.1% below floor
-  AMD    [durability] 3y revenue CAGR   13.6% below floor
-  FTNT   [durability] 3y revenue CAGR   15.5% below floor
-  GOOGL  [durability] 3y revenue CAGR   10.8% below floor
+  ALHC   cagr3y=  23.5% mom12-1=  62.1% qtrs=9 r40=  18.2% dilution=   0.2%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+Rejected: 174
+  CIRC   [durability] no 3y revenue history; only 2 consecutive growth quarters; dilution   13.5% above cap
+  CRMD   [durability] no 3y revenue history; only 2 consecutive growth quarters
+  SKYX   [durability] only 0 consecutive growth quarters
+  VXRT   [durability] only 0 consecutive growth quarters
+  PROP   [durability] only 2 consecutive growth quarters; dilution   24.0% above cap
+  UPC    [durability] only 0 consecutive growth quarters; dilution 1213.8% above cap
+  TKLF   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  FEIM   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  ACVA   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  NODK   [durability] 3y revenue CAGR  -11.9% below floor; only 1 consecutive growth quarters
+  QXO    [durability] no 3y revenue history; dilution   43.1% above cap
+  GEVO   [durability] only 0 consecutive growth quarters
+  KIM    [durability] 3y revenue CAGR    0.6% below floor; only 0 consecutive growth quarters
+  OPRX   [durability] only 0 consecutive growth quarters
+  CIFR   [durability] only 0 consecutive growth quarters
+  HTLM   [durability] only 0 consecutive growth quarters
+  MSC    [durability] only 0 consecutive growth quarters
+  LOT    [durability] only 0 consecutive growth quarters
+  GMM    [durability] no 3y revenue history; only 0 consecutive growth quarters; dilution   10.1% above cap
+  IMMR   [durability] only 0 consecutive growth quarters
+  BKKT   [durability] only 0 consecutive growth quarters
+  VRDN   [durability] only 3 consecutive growth quarters; dilution   10.5% above cap
+  CHCT   [durability] 3y revenue CAGR  -25.2% below floor; only 0 consecutive growth quarters
+  HKHC   [durability] only 0 consecutive growth quarters
+  ONDS   [durability] dilution   13.0% above cap
+  ANAB   [durability] only 0 consecutive growth quarters
+  IPSC   [durability] only 3 consecutive growth quarters
+  GIFT   [durability] only 0 consecutive growth quarters
+  QTTB   [durability] 3y revenue CAGR  -24.6% below floor; only 0 consecutive growth quarters; dilution   62.3% above cap
+  NGS    [durability] only 0 consecutive growth quarters
+  AMPX   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  STOK   [durability] only 0 consecutive growth quarters
+  ABTC   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  BETR   [durability] only 0 consecutive growth quarters; dilution   13.7% above cap
+  FLOC   [durability] only 0 consecutive growth quarters
+  DEI    [durability] 3y revenue CAGR   -7.9% below floor; only 0 consecutive growth quarters
+  WULF   [durability] 3y revenue CAGR   -8.0% below floor; only 2 consecutive growth quarters; dilution   17.4% above cap
+  CGEN   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  FOA    [durability] only 0 consecutive growth quarters
+  EH     [durability] only 0 consecutive growth quarters
+  ALTO   [durability] 3y revenue CAGR  -58.8% below floor; only 2 consecutive growth quarters
+  INVZ   [durability] only 0 consecutive growth quarters
+  UFG    [durability] only 0 consecutive growth quarters
+  TSSI   [durability] only 0 consecutive growth quarters
   NVDA   [durability] only 1 consecutive growth quarters
-  OSCR   [durability] 3y revenue CAGR  -23.9% below floor
-  PANW   [durability] 3y revenue CAGR   18.8% below floor; dilution   15.6% above cap
-  TSM    [durability] no 3y revenue history; only 0 consecutive growth quarters
+  ARDX   [durability] only 2 consecutive growth quarters
+  ATLCP  [durability] no 3y revenue history; only 0 consecutive growth quarters
+  EVGO   [durability] only 0 consecutive growth quarters
+  TMDX   [durability] only 3 consecutive growth quarters
+  COE    [durability] only 0 consecutive growth quarters
+  COHN   [durability] no 3y revenue history; only 0 consecutive growth quarters; dilution   30.3% above cap
+  MGRC   [durability] 3y revenue CAGR   10.4% below floor; only 0 consecutive growth quarters
+  MARA   [durability] only 0 consecutive growth quarters
+  CLSK   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  CHRN   [durability] no 3y revenue history; only 0 consecutive growth quarters; dilution 3987.1% above cap
+  NXXT   [durability] no 3y revenue history
+  SOUN   [durability] no 3y revenue history; only 1 consecutive growth quarters
+  ANG-PD [durability] only 0 consecutive growth quarters
+  UUUU   [durability] only 3 consecutive growth quarters
+  ABX    [durability] no 3y revenue history
+  SRFM   [durability] only 0 consecutive growth quarters; dilution   52.0% above cap
+  MRDN   [durability] no 3y revenue history; only 1 consecutive growth quarters
+  ASTS   [durability] only 0 consecutive growth quarters
+  MGTX   [durability] 3y revenue CAGR    6.2% below floor; only 0 consecutive growth quarters; dilution   15.6% above cap
+  BCYC   [durability] only 0 consecutive growth quarters
+  CWCO   [durability] only 0 consecutive growth quarters
+  ROOT   [durability] only 0 consecutive growth quarters
+  SPRU   [durability] only 0 consecutive growth quarters
+  ACTG   [durability] only 1 consecutive growth quarters
+  WLKP   [durability] 3y revenue CAGR   17.5% below floor; only 0 consecutive growth quarters
+  NXPL   [durability] only 0 consecutive growth quarters
+  SPWR   [durability] no 3y revenue history; only 0 consecutive growth quarters; dilution   25.9% above cap
+  HIMS   [durability] only 1 consecutive growth quarters
+  ELTP   [durability] only 0 consecutive growth quarters
+  IDYA   [durability] only 0 consecutive growth quarters
+  ATAT   [durability] only 0 consecutive growth quarters
+  KRNT   [durability] only 0 consecutive growth quarters
+  SMCI   [durability] only 2 consecutive growth quarters
+  NUTX   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  HIPO   [durability] only 1 consecutive growth quarters
+  FBNC   [durability] only 0 consecutive growth quarters
+  MAAS   [durability] no 3y revenue history; only 0 consecutive growth quarters; dilution  316.2% above cap
+  CELH   [durability] only 0 consecutive growth quarters
+  MLCO   [durability] only 0 consecutive growth quarters
+  VIVK   [durability] only 0 consecutive growth quarters
+  AVAV   [durability] no 3y revenue history; only 3 consecutive growth quarters
+  LKNCY  [durability] only 0 consecutive growth quarters
+  BTBT   [durability] only 0 consecutive growth quarters
+  MNKD   [durability] only 3 consecutive growth quarters
+  MDIA   [durability] only 0 consecutive growth quarters
+  KKR    [durability] 3y revenue CAGR    9.2% below floor; only 1 consecutive growth quarters
+  ARWR   [durability] only 1 consecutive growth quarters
+  IQST   [durability] only 3 consecutive growth quarters; dilution   62.1% above cap
+  ATH-PA [durability] only 1 consecutive growth quarters
+  CPOP   [durability] only 0 consecutive growth quarters
+  ALTI   [durability] only 0 consecutive growth quarters
+  ADMA   [durability] only 0 consecutive growth quarters
+  HOOD   [durability] no 3y revenue history; only 1 consecutive growth quarters
+  AIOT   [durability] only 0 consecutive growth quarters
+  PDD    [durability] only 0 consecutive growth quarters
+  RIVN   [durability] only 1 consecutive growth quarters
+  BCRX   [durability] only 1 consecutive growth quarters
+  WTM    [durability] 3y revenue CAGR    2.1% below floor; only 1 consecutive growth quarters
+  INOD   [durability] no 3y revenue history
+  LVS    [durability] only 0 consecutive growth quarters
+  GCL    [durability] only 0 consecutive growth quarters
+  TOUR   [durability] only 0 consecutive growth quarters
+  HROW   [durability] only 0 consecutive growth quarters
+  TCOM   [durability] only 0 consecutive growth quarters
+  IA     [durability] no 3y revenue history; only 1 consecutive growth quarters
+  BMTM   [durability] only 0 consecutive growth quarters
+  FUFU   [durability] only 0 consecutive growth quarters
+  LSAK   [durability] only 0 consecutive growth quarters
+  MKL    [durability] only 0 consecutive growth quarters
+  TAL    [durability] only 0 consecutive growth quarters
+  APO    [durability] only 1 consecutive growth quarters
+  UEC    [durability] no 3y revenue history; only 0 consecutive growth quarters
+  GMED   [durability] only 0 consecutive growth quarters
+  ELF    [durability] only 3 consecutive growth quarters
+  AMSC   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  DUOL   [durability] dilution   30.1% above cap
+  ANIP   [durability] dilution   11.4% above cap
+  EVLV   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  RXST   [durability] only 0 consecutive growth quarters
+  TIGR   [durability] only 0 consecutive growth quarters
+  DKNG   [durability] only 0 consecutive growth quarters
+  GRAL   [durability] only 3 consecutive growth quarters
+  BAER   [durability] only 0 consecutive growth quarters
+  RBA    [durability] only 0 consecutive growth quarters
+  FUTU   [durability] only 0 consecutive growth quarters
+  BNT    [durability] only 0 consecutive growth quarters; dilution   59.6% above cap
+  FPH    [durability] only 1 consecutive growth quarters
+  GCT    [durability] no 3y revenue history; only 2 consecutive growth quarters
+  LRHC   [durability] no 3y revenue history; only 0 consecutive growth quarters; dilution  352.8% above cap
+  SUNE   [durability] only 0 consecutive growth quarters; dilution   58.0% above cap
+  PODD   [durability] 3y revenue CAGR   12.7% below floor; only 0 consecutive growth quarters
+  RUM    [durability] no 3y revenue history; only 0 consecutive growth quarters
+  STKS   [durability] no 3y revenue history; only 0 consecutive growth quarters
+  RNR    [durability] only 0 consecutive growth quarters
+  JETMF  [durability] only 0 consecutive growth quarters
+  RJET   [durability] 3y revenue CAGR    6.6% below floor; only 2 consecutive growth quarters
+  CVRX   [durability] only 2 consecutive growth quarters
+  CSTL   [durability] only 1 consecutive growth quarters
+  TNGX   [durability] only 0 consecutive growth quarters; dilution   16.8% above cap
+  RIOT   [durability] only 0 consecutive growth quarters
+  ODD    [durability] only 0 consecutive growth quarters
+  AGL    [durability] only 0 consecutive growth quarters
+  HSAI   [durability] only 0 consecutive growth quarters
+  IBRX   [data] price fetch failed: HTTP 429 - throttled (https://api.tiingo.com/tiingo/daily/IBRX/prices)
+  TGTX   [data] price fetch failed: HTTP 429 - throttled (https://api.tiingo.com/tiingo/daily/TGTX/prices)
+  ARQT   [data] price fetch failed: HTTP 429 - throttled (https://api.tiingo.com/tiingo/daily/ARQT/prices)
+  SPRY   [data] price fetch failed: HTTP 429 - throttled (https://api.tiingo.com/tiingo/daily/SPRY/prices)
+  DCTH   [data] price fetch failed: HTTP 429 - throttled (https://api.tiingo.com/tiingo/daily/DCTH/prices)
+  IONQ   [momentum] 12-1 momentum  -18.8% below floor
+  ZVRA   [momentum] 12-1 momentum    8.1% below floor
+  EOSE   [momentum] 12-1 momentum  -38.3% below floor
+  OSG    [momentum] 12-1 momentum   -7.4% below floor
+  NIXX   [momentum] 12-1 momentum  -58.8% below floor
+  PRCT   [momentum] 12-1 momentum  -70.1% below floor
+  RDZN   [momentum] 12-1 momentum    6.5% below floor
+  TEM    [momentum] 12-1 momentum  -24.7% below floor
+  AGIO   [momentum] 12-1 momentum   -8.5% below floor
+  SYM    [momentum] 12-1 momentum  -17.9% below floor
+  ONC    [momentum] 12-1 momentum   10.5% below floor
+  VREOF  [momentum] need 274 daily closes for 12-1, got 36 rows, 2026-06-05..2026-08-21
+  ALNY   [momentum] 12-1 momentum  -17.4% below floor
+  WAL    [momentum] 12-1 momentum    3.2% below floor
+  BOW    [momentum] 12-1 momentum  -12.4% below floor
+  MELI   [momentum] 12-1 momentum  -24.6% below floor
+  PLMR   [momentum] 12-1 momentum   -6.3% below floor
+  KVYO   [momentum] 12-1 momentum  -52.2% below floor
+  FDMT   [exclusion] 8d after earnings - reaction, not trend
+  LQDA   [exclusion] 9d after earnings - reaction, not trend
+  ETON   [exclusion] 8d after earnings - reaction, not trend
