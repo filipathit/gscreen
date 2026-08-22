@@ -1,9 +1,12 @@
-sources: universe=StaticUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True
+sources: universe=StaticUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True  universe_pit=False
 
 Screen as of 2026-08-21: 3 survivors
   CRWD   cagr3y=  29.0% mom12-1=  55.7% qtrs=21 r40=  56.2% dilution=n/a
+         untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
   ANET   cagr3y=  27.1% mom12-1=  60.9% qtrs=18 r40=  75.7% dilution=   0.2%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
   AVGO   cagr3y=  24.4% mom12-1=  41.9% qtrs=8 r40=  66.5% dilution=   0.5%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
 Rejected: 7
   ADBE   [momentum] 12-1 momentum  -43.1% below floor
   APP    [momentum] 12-1 momentum   14.0% below floor
