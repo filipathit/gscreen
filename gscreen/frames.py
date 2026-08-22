@@ -65,11 +65,13 @@ class FramesUniverse:
         cfg: FramesConfig | None = None,
         user_agent: str | None = None,
         cache_dir: str = "_cache/frames",
+        scope: str | None = None,
     ) -> None:
         self.as_of = as_of
         self.cfg = cfg or FramesConfig()
         self.http = _Http(
             cache_dir=cache_dir,
+            scope=scope or as_of,
             min_interval=0.15,
             headers={"User-Agent": user_agent or DEFAULT_UA, "Accept-Encoding": "gzip"},
         )

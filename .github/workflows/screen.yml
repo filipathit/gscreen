@@ -42,13 +42,21 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # Cache fetched responses for the day. Reruns then cost no extra
-      # requests, which matters most for Yahoo's throttling.
+      - name: Cache day
+        id: cacheday
+        run: echo "day=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      # Responses are cached per calendar day. A rerun on the same day costs
+      # no requests at all, which matters most for Tiingo's ~50 symbols/hour.
+      # The key changes at midnight UTC so new filings are picked up; the
+      # restore-key still seeds from the previous day, and the library prunes
+      # anything older than three days.
       - uses: actions/cache@v4
         with:
           path: _cache
-          key: data-${{ github.run_id }}
+          key: data-${{ steps.cacheday.outputs.day }}-${{ github.run_id }}
           restore-keys: |
+            data-${{ steps.cacheday.outputs.day }}-
             data-
 
       - name: Resolve preset

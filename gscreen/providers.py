@@ -31,6 +31,29 @@ import requests
 
 from .normalize import Fundamentals, from_edgar, from_eodhd
 
+from datetime import date
+
+
+def prune_cache(root: Path, keep_days: int = 3) -> list[str]:
+    """Drop day-scoped cache directories beyond the newest `keep_days`.
+
+    Without this the cache grows without bound - every run adds a day, and CI
+    restores the whole thing each time.
+    """
+    if not root.exists():
+        return []
+    days = sorted(
+        (d for d in root.iterdir() if d.is_dir()), key=lambda d: d.name, reverse=True
+    )
+    removed = []
+    for stale in days[keep_days:]:
+        for item in stale.rglob("*"):
+            if item.is_file():
+                item.unlink()
+        stale.rmdir()
+        removed.append(stale.name)
+    return removed
+
 EODHD_BASE = "https://eodhd.com/api"
 YAHOO_CHART = "https://query1.finance.yahoo.com/v8/finance/chart"
 YAHOO_QUOTE = "https://query1.finance.yahoo.com/v7/finance/quote"
@@ -84,16 +107,31 @@ class FundamentalsSource(Protocol):
 
 
 class _Http:
+    """HTTP with a day-scoped response cache.
+
+    Caching matters here because a rerun should cost nothing: EDGAR payloads
+    are tens of megabytes and a free price key allows ~50 symbols an hour.
+
+    The cache is scoped by day rather than kept forever. Tiingo URLs embed
+    endDate so they self-expire, but EDGAR companyfacts and frames URLs carry
+    no date at all - cached once, they would serve pre-filing figures
+    indefinitely and the screen would quietly stop seeing new results.
+    """
+
     def __init__(
         self,
         cache_dir: str | Path | None = ".cache",
         min_interval: float = 0.15,
         max_retries: int = 4,
         headers: dict | None = None,
+        scope: str | None = None,
+        keep_days: int = 3,
     ) -> None:
-        self.cache_dir = Path(cache_dir) if cache_dir else None
+        self.scope = scope or date.today().isoformat()
+        self.cache_dir = Path(cache_dir) / self.scope if cache_dir else None
         if self.cache_dir:
             self.cache_dir.mkdir(parents=True, exist_ok=True)
+            prune_cache(Path(cache_dir), keep_days)
         self.min_interval = min_interval
         self.max_retries = max_retries
         self._last = 0.0
@@ -188,11 +226,13 @@ class _Http:
 class EODHDProvider:
     point_in_time = False
 
-    def __init__(self, api_key: str | None = None, cache_dir="_cache/eodhd") -> None:
+    def __init__(
+        self, api_key: str | None = None, cache_dir="_cache/eodhd", scope=None
+    ) -> None:
         self.api_key = api_key or os.environ.get("EODHD_API_KEY")
         if not self.api_key:
             raise RuntimeError("EODHD_API_KEY is not set.")
-        self.http = _Http(cache_dir=cache_dir)
+        self.http = _Http(cache_dir=cache_dir, scope=scope)
 
     def _get(self, path: str, params: dict) -> Any:
         return self.http.get_json(
@@ -242,9 +282,10 @@ class YahooPrices:
     shared cloud IPs.
     """
 
-    def __init__(self, cache_dir="_cache/yahoo") -> None:
+    def __init__(self, cache_dir="_cache/yahoo", scope=None) -> None:
         self.http = _Http(
             cache_dir=cache_dir,
+            scope=scope,
             min_interval=1.2,  # deliberately slow; politeness is the only fix
             headers={
                 "User-Agent": (
@@ -313,9 +354,10 @@ class StooqPrices:
     For a growth screen that is mostly harmless; for income names it is not.
     """
 
-    def __init__(self, cache_dir="_cache/stooq") -> None:
+    def __init__(self, cache_dir="_cache/stooq", scope=None) -> None:
         self.http = _Http(
             cache_dir=cache_dir,
+            scope=scope,
             min_interval=0.5,
             headers={"User-Agent": "gscreen research script"},
         )
@@ -386,7 +428,9 @@ class TiingoPrices:
     else here.
     """
 
-    def __init__(self, api_key: str | None = None, cache_dir="_cache/tiingo") -> None:
+    def __init__(
+        self, api_key: str | None = None, cache_dir="_cache/tiingo", scope=None
+    ) -> None:
         self.api_key = api_key or os.environ.get("TIINGO_API_KEY")
         if not self.api_key:
             raise RuntimeError(
@@ -396,6 +440,7 @@ class TiingoPrices:
             )
         self.http = _Http(
             cache_dir=cache_dir,
+            scope=scope,
             min_interval=0.4,
             headers={
                 "Content-Type": "application/json",
@@ -441,9 +486,12 @@ class EdgarFundamentals:
 
     point_in_time = True
 
-    def __init__(self, user_agent: str | None = None, cache_dir="_cache/edgar") -> None:
+    def __init__(
+        self, user_agent: str | None = None, cache_dir="_cache/edgar", scope=None
+    ) -> None:
         self.http = _Http(
             cache_dir=cache_dir,
+            scope=scope,
             min_interval=0.15,  # SEC asks for no more than ~10 requests/second
             headers={"User-Agent": user_agent or DEFAULT_UA, "Accept-Encoding": "gzip"},
         )
@@ -615,13 +663,13 @@ def build_provider(
         return cached["fixture"]
 
     def get_eodhd():
-        cached.setdefault("eodhd", EODHDProvider())
+        cached.setdefault("eodhd", EODHDProvider(scope=as_of))
         return cached["eodhd"]
 
     def get_frames():
         from .frames import FramesUniverse  # lazy: frames imports providers
 
-        return FramesUniverse(as_of=as_of or "2026-01-01")
+        return FramesUniverse(as_of=as_of or "2026-01-01", scope=as_of)
 
     universe_source = {
         "eodhd": get_eodhd,
@@ -632,15 +680,15 @@ def build_provider(
 
     price_source = {
         "eodhd": get_eodhd,
-        "tiingo": TiingoPrices,
-        "yahoo": YahooPrices,
-        "stooq": StooqPrices,
+        "tiingo": lambda: TiingoPrices(scope=as_of),
+        "yahoo": lambda: YahooPrices(scope=as_of),
+        "stooq": lambda: StooqPrices(scope=as_of),
         "fixture": get_fixture,
     }[prices]()
 
     fundamentals_source = {
         "eodhd": get_eodhd,
-        "edgar": EdgarFundamentals,
+        "edgar": lambda: EdgarFundamentals(scope=as_of),
         "fixture": get_fixture,
     }[fundamentals]()
 

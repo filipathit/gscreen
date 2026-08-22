@@ -69,6 +69,21 @@ screening today and is a real look-ahead leak in a backtest, so
 than presenting contaminated numbers as clean. For a defensible backtest, fix
 the universe in advance and use `--universe static`.
 
+### Caching
+
+Responses are cached under `_cache/<YYYY-MM-DD>/`, so a rerun on the same day
+costs zero requests — which is what makes iterating viable against a free
+price key of roughly 50 symbols an hour.
+
+The scoping is by day rather than forever, and that matters: Tiingo URLs embed
+`endDate` and self-expire, but EDGAR `companyfacts` and frames URLs carry no
+date at all. Cached indefinitely they would serve pre-filing figures forever
+and the screen would silently stop seeing new results. Directories older than
+three days are pruned on startup so the cache cannot grow without bound.
+
+In CI the cache key includes the UTC date, so it rolls over at midnight and
+seeds from the previous day via `restore-keys`.
+
 ### Why the free price source needs a key
 
 Yahoo and Stooq are both free and keyless, and both refused a GitHub Actions
