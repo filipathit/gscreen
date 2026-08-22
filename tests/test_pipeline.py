@@ -8,7 +8,7 @@ import pytest
 from gscreen import metrics
 from gscreen.llm import parse_response, validate_grounding
 from gscreen.providers import FixtureProvider, serialise_filters
-from gscreen.screen import ScreenConfig, run_screen
+from gscreen.screen import ScreenConfig, extract_facts, run_screen
 
 ROOT = Path(__file__).resolve().parent.parent
 AS_OF = "2026-08-15"
@@ -122,10 +122,15 @@ def test_each_rejection_branch_fires(screened, ticker, stage, fragment):
 
 
 def test_one_quarter_wonder_is_excluded(screened, provider):
-    """DELTA posts +44% in its latest quarter - the exact number the article
-    would screen on - and is correctly rejected."""
-    fundamentals = provider.fundamentals("DELTA.US")
-    assert fundamentals["Highlights"]["QuarterlyRevenueGrowthYOY"] > 0.40
+    """DELTA's latest quarter is +44% YoY - the exact number the article would
+    screen on - yet it has no streak behind it and is correctly rejected."""
+    facts = extract_facts(
+        provider.fundamentals("DELTA", "2026-08-15"),
+        provider.eod_prices("DELTA", "2000-01-01", "2026-08-15"),
+        "2026-08-15",
+    )
+    assert facts["quarterly_revenue_growth_yoy"] > 0.40
+    assert facts["consecutive_growth_quarters"] < 4
     assert "DELTA" not in [row["ticker"] for row in screened.survivors]
 
 

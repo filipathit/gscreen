@@ -26,7 +26,7 @@ jobs:
           {
             echo '## Screen (fixture data)'
             echo '```'
-            PYTHONPATH=. python -m gscreen.cli screen --provider fixture
+            PYTHONPATH=. python -m gscreen.cli screen --preset offline
             echo '```'
             echo '## Grounding validator'
             echo '```'
@@ -34,6 +34,6 @@ jobs:
             echo '```'
             echo '## Backtest'
             echo '```'
-            PYTHONPATH=. python -m gscreen.cli backtest --provider fixture
+            PYTHONPATH=. python -m gscreen.cli backtest --preset offline
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,33 @@
+{
+ "chart": {
+  "result": [
+   {
+    "meta": {
+     "symbol": "TEST",
+     "currency": "USD"
+    },
+    "timestamp": [
+     1735776000,
+     1735862400,
+     1735948800,
+     1736035200,
+     1736121600
+    ],
+    "indicators": {
+     "adjclose": [
+      {
+       "adjclose": [
+        100.0,
+        101.0,
+        102.01,
+        null,
+        104.060401
+       ]
+      }
+     ]
+    }
+   }
+  ],
+  "error": null
+ }
+}

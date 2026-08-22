@@ -1,0 +1,56 @@
+# Static universe for the free preset.
+#
+# This is a starting list, not a recommendation: liquid US-listed companies
+# with enough SEC filing history for a 3-year CAGR. Edit freely - the screen
+# only tells you which of these clear its bars, and why the rest do not.
+#
+# EDGAR covers US filers only, so foreign issuers without 10-K/10-Q filings
+# will come back with empty fundamentals and be rejected as such.
+ADBE
+AMD
+ANET
+APP
+AVGO
+AXON
+CAVA
+CRM
+CRWD
+CRWV
+DDOG
+DKNG
+ELF
+FTNT
+GOOGL
+HIMS
+HOOD
+INTU
+KVYO
+MDB
+META
+MSFT
+MSTR
+NET
+NOW
+NVDA
+ONON
+ORCL
+OSCR
+PANW
+PLTR
+RBLX
+RBRK
+RDDT
+S
+SHOP
+SNOW
+SPOT
+SQ
+TEAM
+TOST
+TSLA
+TTD
+TSM
+UBER
+VRT
+WDAY
+ZS

@@ -1,14 +1,23 @@
 name: screen
 
-# Runs the live screen on a schedule and commits the result, so you can read
-# it in the GitHub mobile app without a machine. Falls back to fixture data
-# if no EODHD key is configured, so the job never silently does nothing.
+# Runs the screen on a schedule and commits the result, so you can read it in
+# the GitHub mobile app without a machine.
+#
+# Sources are chosen at run time. The default is `free`: static universe,
+# Yahoo prices, EDGAR fundamentals - no paid key required. Note that Yahoo
+# throttles shared cloud IPs hard, so some tickers will come back as
+# [data] rejections on a CI runner. That is expected, not a bug.
 
 on:
   schedule:
     - cron: "30 21 * * 1-5"   # 21:30 UTC weekdays, after the US close
   workflow_dispatch:
     inputs:
+      preset:
+        description: "Data sources"
+        type: choice
+        options: [free, offline, paid, hybrid]
+        default: free
       use_llm:
         description: "Run the model stage and enforce grounding"
         type: boolean
@@ -29,22 +38,27 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Pick provider
-        id: mode
+      - name: Resolve preset
+        id: cfg
         env:
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
         run: |
-          if [ -n "$EODHD_API_KEY" ]; then
-            echo "provider=eodhd" >> "$GITHUB_OUTPUT"
-          else
-            echo "provider=fixture" >> "$GITHUB_OUTPUT"
-            echo "::notice::No EODHD_API_KEY secret set - running on fixture data."
+          PRESET="${{ inputs.preset || 'free' }}"
+          # paid/hybrid need a key; fall back rather than fail the schedule
+          if [ "$PRESET" = "paid" ] || [ "$PRESET" = "hybrid" ]; then
+            if [ -z "$EODHD_API_KEY" ]; then
+              echo "::notice::No EODHD_API_KEY secret - falling back to the free preset."
+              PRESET="free"
+            fi
           fi
+          echo "preset=$PRESET" >> "$GITHUB_OUTPUT"
 
       - name: Run screen
         env:
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # SEC asks for a contact address in the User-Agent.
+          SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT || 'gscreen research script' }}
         run: |
           set -o pipefail
           DATE=$(date -u +%F)
@@ -54,10 +68,10 @@ jobs:
             LLM="--llm"
           fi
           PYTHONPATH=. python -m gscreen.cli screen \
-            --provider ${{ steps.mode.outputs.provider }} \
+            --preset "${{ steps.cfg.outputs.preset }}" \
             --as-of "$DATE" $LLM | tee "results/$DATE.txt"
           {
-            echo "## Screen $DATE (${{ steps.mode.outputs.provider }})"
+            echo "## Screen $DATE (preset: ${{ steps.cfg.outputs.preset }})"
             echo '```'
             cat "results/$DATE.txt"
             echo '```'

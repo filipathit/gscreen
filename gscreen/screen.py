@@ -16,6 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from .normalize import Fundamentals
 from .metrics import (
     consecutive_growth_quarters,
     days_since_earnings,
@@ -92,87 +93,57 @@ def _get(obj: dict, *path: str) -> Any:
     return cur
 
 
-def _sorted_yearly(block: dict | None, key: str) -> list[float]:
-    """EODHD financial statements are dicts keyed by date. Oldest first."""
-    if not block:
-        return []
-    out = []
-    for period in sorted(block):
-        raw = block[period].get(key)
-        if raw not in (None, "", "None"):
-            out.append(float(raw))
-    return out
-
-
-def extract_facts(ticker: str, fundamentals: dict, prices: list[dict], as_of: str) -> dict:
-    """Flatten EODHD fundamentals into the exact fact set the screen and the
-    model are allowed to see. Nothing is derived later from thin air."""
-    income_y = _get(fundamentals, "Financials", "Income_Statement", "yearly") or {}
-    income_q = _get(fundamentals, "Financials", "Income_Statement", "quarterly") or {}
-    balance_y = _get(fundamentals, "Financials", "Balance_Sheet", "yearly") or {}
-    cash_y = _get(fundamentals, "Financials", "Cash_Flow", "yearly") or {}
-
-    revenues = _sorted_yearly(income_y, "totalRevenue")
-    shares = _sorted_yearly(balance_y, "commonStockSharesOutstanding")
-    fcf = _sorted_yearly(cash_y, "freeCashFlow")
-
-    latest_revenue = revenues[-1] if revenues else None
+def extract_facts(f: Fundamentals, prices: list[dict], as_of: str) -> dict:
+    """Flatten a normalised Fundamentals record into the exact fact set the
+    screen and the model are allowed to see. Nothing is derived later from
+    thin air, and nothing is read from a vendor-specific shape."""
+    latest_revenue = f.annual_revenue[-1] if f.annual_revenue else None
     fcf_margin = (
-        fcf[-1] / latest_revenue if fcf and latest_revenue else None
+        f.annual_fcf[-1] / latest_revenue
+        if f.annual_fcf and latest_revenue
+        else None
     )
-
-    quarterly_yoy = _quarterly_yoy(income_q)
-    cagr = revenue_cagr(revenues, years=3)
-
-    total_debt = _sorted_yearly(balance_y, "shortLongTermDebtTotal")
-    cash_eq = _sorted_yearly(balance_y, "cashAndShortTermInvestments")
-    ebitda = _get(fundamentals, "Highlights", "EBITDA")
+    quarterly_yoy = _quarterly_yoy(f.quarterly_revenue)
+    cagr = revenue_cagr(f.annual_revenue, years=3)
 
     return {
-        "ticker": ticker,
-        "name": _get(fundamentals, "General", "Name"),
-        "sector": _get(fundamentals, "General", "Sector"),
+        "ticker": f.ticker,
+        "name": f.name,
+        "sector": f.sector,
         "as_of": as_of,
-        "market_cap": _get(fundamentals, "Highlights", "MarketCapitalization"),
+        "source": f.source,
+        "point_in_time": f.point_in_time,
+        "market_cap": f.market_cap,
         "revenue_ttm": latest_revenue,
         "revenue_cagr_3y": cagr,
         "quarterly_revenue_growth_yoy": quarterly_yoy[0] if quarterly_yoy else None,
         "consecutive_growth_quarters": consecutive_growth_quarters(quarterly_yoy, 0.15),
-        "profit_margin": _get(fundamentals, "Highlights", "ProfitMargin"),
+        "profit_margin": f.profit_margin,
         "fcf_margin": fcf_margin,
         "rule_of_40": rule_of_40(cagr, fcf_margin),
-        "share_count_growth": share_count_growth(shares),
-        "net_debt_to_ebitda": net_debt_to_ebitda(
-            total_debt[-1] if total_debt else None,
-            cash_eq[-1] if cash_eq else None,
-            ebitda,
-        ),
-        "price_to_sales_ttm": _get(fundamentals, "Valuation", "PriceSalesTTM"),
-        "ev_to_sales": _get(fundamentals, "Valuation", "EnterpriseValueRevenue"),
+        "share_count_growth": share_count_growth(f.annual_shares),
+        "net_debt_to_ebitda": net_debt_to_ebitda(f.total_debt, f.cash, f.ebitda),
+        "price_to_sales_ttm": f.price_to_sales,
+        "ev_to_sales": f.ev_to_sales,
         "momentum_12_1": momentum_12_1(prices),
         "realised_vol_60d": realised_volatility(prices),
-        "short_pct_float": _get(fundamentals, "SharesStats", "ShortPercentFloat"),
-        "days_since_earnings": days_since_earnings(
-            as_of, _get(fundamentals, "Earnings", "Last_Reported_Date")
-        ),
+        "short_pct_float": f.short_pct_float,
+        "days_since_earnings": days_since_earnings(as_of, f.last_earnings_date),
     }
 
 
-def _quarterly_yoy(income_q: dict) -> list[float | None]:
+def _quarterly_yoy(quarterly: list[tuple[str, float]]) -> list[float | None]:
     """Newest-first YoY growth per quarter, computed from raw revenue.
 
-    Computed, not trusted: the article reads a single vendor-supplied
+    Computed, not trusted: the source article reads a single vendor-supplied
     QuarterlyRevenueGrowthYOY field and never checks it against the statements.
     """
-    periods = sorted(income_q)
-    revenue = {}
-    for period in periods:
-        raw = income_q[period].get("totalRevenue")
-        if raw not in (None, "", "None"):
-            revenue[period] = float(raw)
+    revenue = {period: value for period, value in quarterly}
     ordered = sorted(revenue)
     out: list[float | None] = []
-    for i in range(len(ordered) - 1, 3, -1):
+    for i in range(len(ordered) - 1, 2, -1):
+        if i - 4 < 0:
+            break
         now, year_ago = revenue[ordered[i]], revenue[ordered[i - 4]]
         out.append(now / year_ago - 1 if year_ago > 0 else None)
     return out
@@ -183,23 +154,20 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
     result = ScreenResult(as_of=as_of)
 
     # ---- Pass 1: universe -------------------------------------------------
-    rows = provider.screener(
-        filters=[
-            ["market_capitalization", ">", cfg.min_market_cap],
-            ["exchange", "=", "us"],
-            ["avgvol_200d", ">", cfg.min_avg_volume],
-        ],
-        sort="market_capitalization.desc",
-        limit=cfg.candidates,
-    )
-    universe = [row["code"] for row in rows]
+    universe = provider.universe(cfg.candidates)
 
     facts_by_ticker: dict[str, dict] = {}
     for ticker in universe:
-        prices = provider.eod_prices(f"{ticker}.US", "2000-01-01", as_of)
-        facts = extract_facts(
-            ticker, provider.fundamentals(f"{ticker}.US"), prices, as_of
-        )
+        try:
+            prices = provider.eod_prices(ticker, "2000-01-01", as_of)
+            facts = extract_facts(provider.fundamentals(ticker, as_of), prices, as_of)
+        except Exception as exc:  # noqa: BLE001
+            # Unofficial sources throttle and official ones have gaps. One bad
+            # ticker must not take the run down - record it and carry on.
+            result.rejections.append(
+                Rejection(ticker, "data", f"fetch failed: {type(exc).__name__}")
+            )
+            continue
         facts_by_ticker[ticker] = facts
 
         mom = facts["momentum_12_1"]
@@ -266,7 +234,8 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
             )
             continue
         dse = f["days_since_earnings"]
-        if dse is not None and dse < 0 and not cfg.allow_lookahead:
+        pit = f.get("point_in_time") or cfg.allow_lookahead
+        if dse is not None and dse < 0 and not pit:
             result.rejections.append(
                 Rejection(
                     ticker,

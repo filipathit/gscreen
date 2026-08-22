@@ -24,27 +24,71 @@ that standard. This does, and enforces it in code.
 | 11 | `claude-sonnet-4-6`, a generation behind | Pinned deliberately, `temperature=0`, text blocks concatenated rather than `content[0]` |
 | 12 | Eight survivors, no word on what died or why | Every rejection carries a stage and a written reason |
 | 13 | No backtest of any kind | `backtest.py`, with an explicit point-in-time guard |
+| 14 | Single vendor, hardcoded | Universe, prices and fundamentals chosen independently at run time; free stack available |
+| 15 | One failed request kills the run | Per-ticker failures logged as `[data]` rejections |
+
+## Choosing your data at run time
+
+Three capabilities, each swappable independently:
+
+| | eodhd | yahoo | edgar | static | fixture |
+|---|---|---|---|---|---|
+| universe | screener | – | – | `universe.txt` | offline |
+| prices | paid | free, decades of history | – | – | offline |
+| fundamentals | paid snapshot | – | **free, point-in-time** | – | offline |
+
+Presets are shorthand; any flag overrides the preset:
+
+```bash
+python -m gscreen.cli sources                     # list everything
+python -m gscreen.cli screen --preset offline     # fixtures, no network
+python -m gscreen.cli screen --preset free        # static + Yahoo + EDGAR, $0
+python -m gscreen.cli screen --preset paid        # EODHD throughout
+python -m gscreen.cli screen --preset hybrid      # EODHD discovery, EDGAR facts
+python -m gscreen.cli screen --preset free --prices eodhd   # mix freely
+```
+
+**free** costs nothing but discovers nothing — the universe is whatever is in
+`universe.txt`. **hybrid** is the interesting one: EODHD's screener finds
+candidates, EDGAR supplies fundamentals that are actually point-in-time.
+
+Trade-offs worth knowing before you pick:
+
+- **Yahoo** has had no official API since 2017. These are the endpoints the
+  website calls; they throttle hard, and shared cloud IPs (CI runners) get
+  throttled first. A failed fetch is logged as a `[data]` rejection and the
+  run continues rather than dying.
+- **EDGAR** is official, free, and stamps every fact with its filing date —
+  but covers US filers only, has no market cap, no EBITDA, and no GICS
+  sector. Those fields stay null and the model is told they're missing rather
+  than being handed a guess.
 
 ## The point-in-time finding
 
-Running the backtest surfaces something the article never confronts: the
+Running the backtest surfaces something the article never confronts: a vendor
 fundamentals endpoint serves *current* statements. Replay a past date and you
-score the screen on figures nobody had then. The default config refuses to
-run in that state and says so. `--ignore-lookahead` shows the contaminated
-version, clearly labelled. A defensible backtest needs point-in-time
-fundamentals with original filing dates — a different (and paid) data
-product.
+score the screen on figures nobody had then. The default config refuses to run
+in that state and says so; `--ignore-lookahead` shows the contaminated version,
+clearly labelled.
+
+**EDGAR fixes this.** Every XBRL fact carries a `filed` date, so
+`from_edgar(..., as_of=...)` returns only what was public then — including
+using the restatement that was current at the time rather than the latest one.
+With `--preset free` or `--preset hybrid`, the guard lifts automatically
+because the source is genuinely point-in-time, and the backtest becomes
+evidence instead of scaffolding.
 
 ## Running it
 
 ```bash
 pip install requests pytest
-export EODHD_API_KEY=...        # live mode only
-export ANTHROPIC_API_KEY=...    # for --llm
+export EODHD_API_KEY=...        # only for the paid/hybrid presets
+export ANTHROPIC_API_KEY=...    # only for --llm
+export SEC_USER_AGENT="you@example.com"   # EDGAR asks for a contact address
 
-PYTHONPATH=. python -m gscreen.cli screen   --provider fixture
-PYTHONPATH=. python -m gscreen.cli backtest --provider fixture
-PYTHONPATH=. python -m gscreen.cli screen   --provider eodhd --as-of 2026-08-15 --llm
+PYTHONPATH=. python -m gscreen.cli screen   --preset offline
+PYTHONPATH=. python -m gscreen.cli backtest --preset free
+PYTHONPATH=. python -m gscreen.cli screen   --preset free --as-of 2026-08-15 --llm
 PYTHONPATH=. python tools/grounding_demo.py
 PYTHONPATH=. python -m pytest tests -q
 ```
