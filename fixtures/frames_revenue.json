@@ -1,0 +1,14 @@
+{
+  "taxonomy": "us-gaap",
+  "tag": "Revenues",
+  "ccp": "CY2024",
+  "uom": "USD",
+  "label": "Revenues",
+  "pts": 4,
+  "data": [
+    {"accn": "a1", "cik": 111, "entityName": "Fast Grower Inc", "loc": "US-CA", "start": "2024-01-01", "end": "2024-12-31", "val": 2000000000},
+    {"accn": "a2", "cik": 222, "entityName": "Slow Grower Inc", "loc": "US-NY", "start": "2024-01-01", "end": "2024-12-31", "val": 1100000000},
+    {"accn": "a3", "cik": 333, "entityName": "Tiny Co", "loc": "US-TX", "start": "2024-01-01", "end": "2024-12-31", "val": 5000000},
+    {"accn": "a4", "cik": 444, "entityName": "Private Filer LLC", "loc": "US-DE", "start": "2024-01-01", "end": "2024-12-31", "val": 3000000000}
+  ]
+}

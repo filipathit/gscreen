@@ -16,7 +16,7 @@ on:
       preset:
         description: "Data sources"
         type: choice
-        options: [free, free-stooq, free-yahoo, offline, paid, hybrid]
+        options: [free, free-wide, free-stooq, free-yahoo, offline, paid, hybrid]
         default: free
       limit:
         description: "Max tickers to fetch (keep small on free sources)"
@@ -58,7 +58,7 @@ jobs:
           TIINGO_API_KEY: ${{ secrets.TIINGO_API_KEY }}
         run: |
           PRESET="${{ inputs.preset || 'free' }}"
-          if [ "$PRESET" = "free" ] && [ -z "$TIINGO_API_KEY" ]; then
+          if { [ "$PRESET" = "free" ] || [ "$PRESET" = "free-wide" ]; } && [ -z "$TIINGO_API_KEY" ]; then
             echo "::error::preset 'free' needs a TIINGO_API_KEY secret (free key at tiingo.com)."
             echo "::notice::Yahoo and Stooq are IP-blocked from GitHub runners, so there is no keyless option here."
             exit 1

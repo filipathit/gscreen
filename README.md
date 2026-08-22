@@ -37,6 +37,38 @@ Three capabilities, each swappable independently:
 | prices | paid | **free key, works from CI** | free, IP-blocked from CI | free, IP-blocked from CI | – | – | offline |
 | fundamentals | paid snapshot | – | – | – | **free, point-in-time** | – | offline |
 
+### Discovering a universe instead of guessing one
+
+`universe.txt` is a hand-written list, which means the screen can only ever
+confirm names someone already thought of — the same hindsight bias the source
+article's listicles have, relocated into a file.
+
+`--universe frames` replaces it with SEC's XBRL frames API, where one request
+returns a single fact for *every* US filer in a period:
+
+    data.sec.gov/api/xbrl/frames/us-gaap/Revenues/USD/CY2024.json
+
+A dozen calls cover annual revenue across four years for roughly eight
+thousand filers. Growth is computed cross-sectionally, the list is cut to a
+couple of hundred candidates, and only then does the pipeline spend a price
+call per name — which is what keeps a free Tiingo key viable.
+
+```bash
+python -m gscreen.cli universe --preset free-wide   # preview + funnel counts
+python -m gscreen.cli screen   --preset free-wide --limit 50
+```
+
+The funnel prints why each filer dropped out: incomplete history, below the
+revenue floor, below the growth floor, or no ticker (private filers, trusts,
+and funds all file XBRL too).
+
+**Frames are not point-in-time.** Unlike companyfacts, a frame carries no
+`filed` date, and restatements silently replace originals. That is fine for
+screening today and is a real look-ahead leak in a backtest, so
+`FramesUniverse.point_in_time` is False and `backtest` prints a warning rather
+than presenting contaminated numbers as clean. For a defensible backtest, fix
+the universe in advance and use `--universe static`.
+
 ### Why the free price source needs a key
 
 Yahoo and Stooq are both free and keyless, and both refused a GitHub Actions

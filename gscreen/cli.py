@@ -102,7 +102,8 @@ def doctor(args) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(prog="gscreen")
     parser.add_argument(
-        "command", choices=["screen", "backtest", "prompt", "sources", "doctor"]
+        "command",
+        choices=["screen", "backtest", "prompt", "sources", "doctor", "universe"],
     )
     parser.add_argument("--preset", default="offline", choices=sorted(PRESETS))
     parser.add_argument("--universe", choices=SOURCES["universe"])
@@ -139,12 +140,23 @@ def main() -> None:
         return
 
     universe, prices, fundamentals = resolve_sources(args)
-    provider = build_provider(universe, prices, fundamentals, FIXTURES, UNIVERSE_FILE)
+    provider = build_provider(
+        universe, prices, fundamentals, FIXTURES, UNIVERSE_FILE, as_of=as_of
+    )
     cfg = ScreenConfig(allow_lookahead=args.ignore_lookahead)
     if args.limit:
         cfg.candidates = args.limit
 
     print(f"sources: {provider.describe()}\n")
+
+    if args.command == "universe":
+        tickers = provider.universe(cfg.candidates)
+        funnel = getattr(provider.universe_source, "describe_funnel", None)
+        if funnel:
+            print(funnel(), "\n")
+        print(f"{len(tickers)} candidates")
+        print(" ".join(tickers))
+        return
 
     if args.command == "screen":
         result = run_screen(provider, args.as_of, cfg)

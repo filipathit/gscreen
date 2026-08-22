@@ -540,6 +540,12 @@ class CompositeProvider:
     def point_in_time(self) -> bool:
         return bool(getattr(self.fundamentals_source, "point_in_time", False))
 
+    @property
+    def universe_point_in_time(self) -> bool:
+        """Frames carry no filing dates, so a frames-selected universe leaks
+        information into any past-dated run. Callers need to know."""
+        return bool(getattr(self.universe_source, "point_in_time", False))
+
     def describe(self) -> str:
         def name(obj):
             return type(obj).__name__
@@ -549,6 +555,7 @@ class CompositeProvider:
             f"prices={name(self.price_source)}  "
             f"fundamentals={name(self.fundamentals_source)}  "
             f"point_in_time={self.point_in_time}"
+            + ("" if self.universe_point_in_time else "  universe_pit=False")
         )
 
     def universe(self, limit: int) -> list[str]:
@@ -562,7 +569,7 @@ class CompositeProvider:
 
 
 SOURCES = {
-    "universe": ("eodhd", "static", "fixture"),
+    "universe": ("eodhd", "frames", "static", "fixture"),
     "prices": ("eodhd", "tiingo", "yahoo", "stooq", "fixture"),
     "fundamentals": ("eodhd", "edgar", "fixture"),
 }
@@ -574,6 +581,9 @@ PRESETS = {
     # CI runner, because it authenticates by token rather than by IP. Yahoo
     # (429) and Stooq (bot-challenge page) both refused ours.
     "free": ("static", "tiingo", "edgar"),
+    # Thousands of US filers screened cross-sectionally before any price call.
+    # Frames are not point-in-time - fine for today, leaky in a backtest.
+    "free-wide": ("frames", "tiingo", "edgar"),
     "free-stooq": ("static", "stooq", "edgar"),
     "free-yahoo": ("static", "yahoo", "edgar"),
     "paid": ("eodhd", "eodhd", "eodhd"),
@@ -587,6 +597,7 @@ def build_provider(
     fundamentals: str,
     fixtures_dir: str | Path,
     universe_file: str | Path,
+    as_of: str | None = None,
 ) -> CompositeProvider:
     """Assemble a provider from three independent runtime choices."""
     cached: dict[str, Any] = {}
@@ -599,8 +610,14 @@ def build_provider(
         cached.setdefault("eodhd", EODHDProvider())
         return cached["eodhd"]
 
+    def get_frames():
+        from .frames import FramesUniverse  # lazy: frames imports providers
+
+        return FramesUniverse(as_of=as_of or "2026-01-01")
+
     universe_source = {
         "eodhd": get_eodhd,
+        "frames": get_frames,
         "static": lambda: StaticUniverse(universe_file),
         "fixture": get_fixture,
     }[universe]()

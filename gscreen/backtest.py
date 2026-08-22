@@ -49,6 +49,14 @@ def backtest(
     cfg = cfg or ScreenConfig()
     results = []
 
+    if not getattr(provider, "universe_point_in_time", True):
+        print(
+            "WARNING: the universe source is not point-in-time. Candidates were\n"
+            "         selected using figures published after the rebalance date,\n"
+            "         which flatters every number below. Use a static universe\n"
+            "         fixed in advance for a defensible backtest.\n"
+        )
+
     # A rebalance date on a weekend silently shifts every window.
     dates = [previous_trading_day(d) for d in dates]
 
@@ -81,7 +89,8 @@ def backtest(
 def _returns(provider, tickers: list[str], as_of: str, horizon: int) -> list[float]:
     out = []
     for ticker in tickers:
-        prices = provider.eod_prices(f"{ticker}.US", "2000-01-01", "2100-01-01")
+        # No ".US" suffix: each provider handles its own symbol format now.
+        prices = provider.eod_prices(ticker, "2000-01-01", "2100-01-01")
         ret = forward_return(prices, as_of, horizon)
         if ret is not None:
             out.append(ret)
