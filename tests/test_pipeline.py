@@ -109,7 +109,7 @@ def test_survivors_are_the_durable_names(screened):
         ("INDIA", "momentum", "12-1 momentum"),
         ("CHARL", "durability", "net debt/EBITDA"),
         ("HOTEL", "durability", "CAGR"),
-        ("DELTA", "durability", "consecutive growth quarters"),
+        ("DELTA", "durability", "quarters above"),
         ("ECHO", "durability", "dilution"),
         ("GOLF", "exclusion", "after earnings"),
         ("FOXTR", "exclusion", "short interest"),
@@ -241,3 +241,54 @@ def test_streak_counts_correctly_with_gappy_filings():
         ("2025-03-31", 169.0), ("2025-06-30", 169.0), ("2025-09-30", 169.0),
     ]
     assert consecutive_growth_quarters(_quarterly_yoy(quarterly), 0.15) == 6
+
+
+def test_quarterly_threshold_config_is_actually_used():
+    """The knob existed in ScreenConfig but the threshold was hardcoded at
+    0.15, so setting it did nothing."""
+    from gscreen.providers import FixtureProvider
+    from gscreen.screen import ScreenConfig, run_screen
+
+    root = Path(__file__).resolve().parent.parent
+    lenient = run_screen(
+        FixtureProvider(root / "fixtures"),
+        "2026-08-15",
+        ScreenConfig(quarterly_growth_threshold=0.01, min_consecutive_quarters=4),
+    )
+    strict = run_screen(
+        FixtureProvider(root / "fixtures"),
+        "2026-08-15",
+        ScreenConfig(quarterly_growth_threshold=0.90, min_consecutive_quarters=4),
+    )
+    assert len(lenient.survivors) > len(strict.survivors)
+    assert strict.survivors == []
+
+
+def test_streak_rejection_names_the_bar_and_the_miss():
+    from gscreen.providers import FixtureProvider
+    from gscreen.screen import ScreenConfig, run_screen
+
+    root = Path(__file__).resolve().parent.parent
+    result = run_screen(FixtureProvider(root / "fixtures"), "2026-08-15", ScreenConfig())
+    delta = next(r for r in result.rejections if r.ticker == "DELTA")
+    assert "1/4 quarters above" in delta.reason
+    assert "15.0% YoY" in delta.reason
+    assert "latest quarter" in delta.reason
+
+
+def test_price_budget_spends_on_the_strongest_candidates():
+    """Truncating an unranked list would spend the metered calls on whatever
+    order the dict happened to be in."""
+    from gscreen.providers import FixtureProvider
+    from gscreen.screen import ScreenConfig, run_screen
+
+    root = Path(__file__).resolve().parent.parent
+    calls = []
+
+    class Counting(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            calls.append(ticker)
+            return super().eod_prices(ticker, start, end)
+
+    run_screen(Counting(root / "fixtures"), "2026-08-15", ScreenConfig(max_price_calls=1))
+    assert calls == ["ALPHA"]  # highest 3y CAGR among durability survivors

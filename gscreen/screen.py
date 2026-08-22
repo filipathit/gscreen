@@ -111,7 +111,9 @@ def extract_facts(f: Fundamentals, prices: list[dict], as_of: str) -> dict:
     return attach_price_facts(extract_fundamental_facts(f, as_of), prices)
 
 
-def extract_fundamental_facts(f: Fundamentals, as_of: str) -> dict:
+def extract_fundamental_facts(
+    f: Fundamentals, as_of: str, quarterly_threshold: float = 0.15
+) -> dict:
     """Flatten a normalised Fundamentals record into the exact fact set the
     screen and the model are allowed to see. Nothing is derived later from
     thin air, and nothing is read from a vendor-specific shape."""
@@ -135,7 +137,11 @@ def extract_fundamental_facts(f: Fundamentals, as_of: str) -> dict:
         "revenue_ttm": latest_revenue,
         "revenue_cagr_3y": cagr,
         "quarterly_revenue_growth_yoy": quarterly_yoy[0] if quarterly_yoy else None,
-        "consecutive_growth_quarters": consecutive_growth_quarters(quarterly_yoy, 0.15),
+        "quarterly_yoy": quarterly_yoy,
+        "quarterly_growth_threshold": quarterly_threshold,
+        "consecutive_growth_quarters": consecutive_growth_quarters(
+            quarterly_yoy, quarterly_threshold
+        ),
         "profit_margin": f.profit_margin,
         "fcf_margin": fcf_margin,
         "rule_of_40": rule_of_40(cagr, fcf_margin),
@@ -222,7 +228,11 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
     for index, ticker in enumerate(universe, 1):
         print(f"  [{index}/{len(universe)}] {ticker}", file=sys.stderr, flush=True)
         try:
-            facts = extract_fundamental_facts(provider.fundamentals(ticker, as_of), as_of)
+            facts = extract_fundamental_facts(
+                provider.fundamentals(ticker, as_of),
+                as_of,
+                cfg.quarterly_growth_threshold,
+            )
         except Exception as exc:  # noqa: BLE001
             result.rejections.append(
                 Rejection(ticker, "data", f"fundamentals fetch failed: {exc}"[:200])
@@ -239,8 +249,16 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
         elif f["revenue_cagr_3y"] < cfg.min_revenue_cagr_3y:
             reasons.append(f"3y revenue CAGR {_pct(f['revenue_cagr_3y'])} below floor")
         if f["consecutive_growth_quarters"] < cfg.min_consecutive_quarters:
+            yoy = f.get("quarterly_yoy") or []
+            latest = (
+                "no quarterly data"
+                if not yoy or yoy[0] is None
+                else f"latest quarter {_pct(yoy[0])}"
+            )
             reasons.append(
-                f"only {f['consecutive_growth_quarters']} consecutive growth quarters"
+                f"{f['consecutive_growth_quarters']}/{cfg.min_consecutive_quarters} "
+                f"quarters above {_pct(cfg.quarterly_growth_threshold)} YoY "
+                f"({latest})"
             )
         if (
             cfg.min_rule_of_40 is not None
@@ -281,6 +299,10 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
             passed_2.append(ticker)
 
     # ---- Pass 3: momentum (metered - survivors only) ----------------------
+    # Budget truncation must not be arbitrary: rank before cutting.
+    passed_2.sort(
+        key=lambda t: facts_by_ticker[t]["revenue_cagr_3y"] or 0, reverse=True
+    )
     if cfg.max_price_calls is not None and len(passed_2) > cfg.max_price_calls:
         for ticker in passed_2[cfg.max_price_calls :]:
             result.rejections.append(
