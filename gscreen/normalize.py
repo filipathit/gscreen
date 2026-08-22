@@ -204,14 +204,23 @@ def from_edgar(
         if period in annual_rev
     }
 
-    shares_facts = _first_available(raw, SHARES_TAGS, as_of)
-    if not shares_facts:
-        # Many filers report share count only in the dei taxonomy on the
-        # cover page. Without this, dilution silently came back null.
-        shares_facts = _visible(
+    # Dilution needs at least two periods. A tag that reports one period is
+    # useless here, so pick whichever candidate yields the longest series
+    # rather than the first that returns anything.
+    shares_candidates = [
+        _visible(_usd_facts(raw, tag), as_of) for tag in SHARES_TAGS
+    ]
+    shares_candidates.append(
+        _visible(
             _usd_facts(raw, "EntityCommonStockSharesOutstanding", taxonomy="dei"),
             as_of,
         )
+    )
+    shares_facts = max(
+        shares_candidates,
+        key=lambda facts: len({f["end"] for f in facts if f.get("end")}),
+        default=[],
+    )
     shares = _latest_per_period([f for f in shares_facts if f.get("end")])
 
     debt_facts = _first_available(raw, DEBT_TAGS, as_of)

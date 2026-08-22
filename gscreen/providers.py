@@ -484,12 +484,20 @@ class StaticUniverse:
 
     def universe(self, limit: int) -> list[str]:
         lines = self.path.read_text().splitlines()
-        tickers = [
-            line.strip().upper()
-            for line in lines
-            if line.strip() and not line.strip().startswith("#")
-        ]
+        tickers = []
+        for line in lines:
+            text = line.split("#", 1)[0].strip().upper()  # allow trailing notes
+            if text:
+                tickers.append(text)
         return tickers[:limit]
+
+    def unknown_to_sec(self, edgar) -> list[str]:
+        """Tickers SEC has never heard of - almost always renames or delistings.
+
+        A hand-written list rots: Block became XYZ, and the screen reported it
+        as a price problem rather than a stale universe.
+        """
+        return [t for t in self.universe(10_000) if not edgar.cik_for(t)]
 
 
 # --------------------------------------------------------------------------

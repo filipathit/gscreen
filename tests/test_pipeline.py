@@ -188,3 +188,56 @@ def test_grounding_rejects_unknown_ticker(screened):
 
 def test_parse_response_strips_code_fences(screened):
     assert parse_response('```json\n[{"ticker": "A"}]\n```') == [{"ticker": "A"}]
+
+
+# --------------------------------------------------------------------------
+# YoY must match by date, not by counting entries
+# --------------------------------------------------------------------------
+
+
+def test_yoy_survives_the_missing_q4_hole():
+    """Filers fold Q4 into the 10-K, so the quarterly series has a gap every
+    year. Counting back four entries lands 15-16 months earlier."""
+    from gscreen.screen import _quarterly_yoy
+
+    quarterly = [
+        ("2024-03-31", 100.0), ("2024-06-30", 110.0), ("2024-09-30", 120.0),
+        # no Q4 - it lives inside the annual figure
+        ("2025-03-31", 150.0), ("2025-06-30", 165.0), ("2025-09-30", 180.0),
+    ]
+    yoy = _quarterly_yoy(quarterly)
+    assert yoy[0] == pytest.approx(0.50)   # 180 vs 120, not 180 vs 110
+    assert yoy[1] == pytest.approx(0.50)   # 165 vs 110
+    assert yoy[2] == pytest.approx(0.50)   # 150 vs 100
+    assert len(yoy) == 3
+
+
+def test_yoy_handles_a_non_calendar_fiscal_year():
+    """NVDA's year ends in late January; quarter ends drift year to year."""
+    from gscreen.screen import _quarterly_yoy
+
+    quarterly = [
+        ("2024-04-28", 100.0), ("2024-07-28", 110.0), ("2024-10-27", 120.0),
+        ("2025-04-27", 200.0), ("2025-07-27", 231.0), ("2025-10-26", 252.0),
+    ]
+    yoy = _quarterly_yoy(quarterly)
+    assert yoy[0] == pytest.approx(1.10)   # 252 vs 120
+    assert all(v > 0.9 for v in yoy)
+
+
+def test_yoy_stops_when_no_year_ago_quarter_exists():
+    from gscreen.screen import _quarterly_yoy
+
+    assert _quarterly_yoy([("2025-03-31", 100.0), ("2025-06-30", 110.0)]) == []
+
+
+def test_streak_counts_correctly_with_gappy_filings():
+    from gscreen.metrics import consecutive_growth_quarters
+    from gscreen.screen import _quarterly_yoy
+
+    quarterly = [
+        ("2023-03-31", 100.0), ("2023-06-30", 100.0), ("2023-09-30", 100.0),
+        ("2024-03-31", 130.0), ("2024-06-30", 130.0), ("2024-09-30", 130.0),
+        ("2025-03-31", 169.0), ("2025-06-30", 169.0), ("2025-09-30", 169.0),
+    ]
+    assert consecutive_growth_quarters(_quarterly_yoy(quarterly), 0.15) == 6

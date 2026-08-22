@@ -83,6 +83,16 @@ def doctor(args) -> None:
 
     edgar = EdgarFundamentals()
     check("edgar ticker index", lambda: f"CIK {edgar.cik_for(ticker)}")
+
+    def stale():
+        unknown = StaticUniverse(UNIVERSE_FILE).unknown_to_sec(edgar)
+        return (
+            "all tickers known to SEC"
+            if not unknown
+            else f"UNKNOWN (renamed or delisted?): {', '.join(unknown)}"
+        )
+
+    check("universe.txt freshness", stale)
     check(
         "edgar fundamentals",
         lambda: (

@@ -140,20 +140,41 @@ def extract_facts(f: Fundamentals, prices: list[dict], as_of: str) -> dict:
     }
 
 
-def _quarterly_yoy(quarterly: list[tuple[str, float]]) -> list[float | None]:
-    """Newest-first YoY growth per quarter, computed from raw revenue.
+def _quarterly_yoy(
+    quarterly: list[tuple[str, float]], tolerance_days: int = 35
+) -> list[float | None]:
+    """Newest-first YoY growth per quarter, matched BY DATE.
 
     Computed, not trusted: the source article reads a single vendor-supplied
     QuarterlyRevenueGrowthYOY field and never checks it against the statements.
+
+    The comparison quarter is found by date, not by counting back four entries.
+    Filers report Q1-Q3 in 10-Qs and fold Q4 into the 10-K as a full-year
+    figure, so the quarterly series has a hole every year; stepping back four
+    entries lands 15-16 months earlier and produces nonsense. Fiscal years that
+    do not align to calendar quarters (NVDA ends in late January) make it
+    worse.
     """
+    from datetime import date
+
     revenue = {period: value for period, value in quarterly}
     ordered = sorted(revenue)
+    parsed = {period: date.fromisoformat(period) for period in ordered}
+
     out: list[float | None] = []
-    for i in range(len(ordered) - 1, 2, -1):
-        if i - 4 < 0:
-            break
-        now, year_ago = revenue[ordered[i]], revenue[ordered[i - 4]]
-        out.append(now / year_ago - 1 if year_ago > 0 else None)
+    for period in reversed(ordered):
+        target = parsed[period].toordinal() - 365
+        best, best_gap = None, tolerance_days + 1
+        for candidate in ordered:
+            if candidate >= period:
+                continue
+            gap = abs(parsed[candidate].toordinal() - target)
+            if gap < best_gap:
+                best, best_gap = candidate, gap
+        if best is None:
+            break  # no year-ago quarter within tolerance: the streak ends here
+        year_ago = revenue[best]
+        out.append(revenue[period] / year_ago - 1 if year_ago > 0 else None)
     return out
 
 

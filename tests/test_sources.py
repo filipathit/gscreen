@@ -111,7 +111,9 @@ def test_yahoo_parser_handles_empty_result():
 
 def test_static_universe_skips_comments_and_blanks(tmp_path):
     path = tmp_path / "u.txt"
-    path.write_text("# a comment\n\nAAA\n  bbb  \n\n# another\nCCC\n")
+    path.write_text(
+        "# a comment\n\nAAA\n  bbb  \n\n# another\nCCC  # renamed in 2025\n"
+    )
     assert StaticUniverse(path).universe(limit=10) == ["AAA", "BBB", "CCC"]
     assert StaticUniverse(path).universe(limit=2) == ["AAA", "BBB"]
 
@@ -410,3 +412,23 @@ def test_edgar_falls_back_to_dei_for_share_count():
     f = from_edgar("DEIO", raw, "2026-01-01")
     assert f.annual_shares == [1_000_000, 1_050_000]
     assert share_count_growth(f.annual_shares) == pytest.approx(0.05)
+
+
+def test_stale_tickers_are_detected_against_the_sec_index():
+    """SQ returned zero price rows because Block renamed to XYZ. That is a
+    stale universe, not a price-source failure."""
+
+    class FakeEdgar:
+        known = {"AAPL", "MSFT"}
+
+        def cik_for(self, ticker):
+            return "0000000001" if ticker in self.known else None
+
+    import tempfile
+    from pathlib import Path
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "u.txt"
+        path.write_text("AAPL\nMSFT\nSQ\nDELISTED\n")
+        stale = StaticUniverse(path).unknown_to_sec(FakeEdgar())
+    assert stale == ["SQ", "DELISTED"]
