@@ -109,11 +109,54 @@ def doctor(args) -> None:
     )
 
 
+def explain(provider, ticker: str, as_of: str) -> None:
+    """Dump the working for one company.
+
+    A rejection like "only 1 consecutive growth quarters" is a conclusion, not
+    evidence. This prints the quarterly revenue series and each YoY pairing so
+    a surprising verdict can be checked rather than believed.
+    """
+    from .screen import _quarterly_yoy, extract_fundamental_facts
+
+    f = provider.fundamentals(ticker, as_of)
+    print(f"{ticker}  source={f.source}  point_in_time={f.point_in_time}")
+    print(f"name: {f.name}\n")
+
+    print("annual revenue (oldest first):")
+    for value in f.annual_revenue:
+        print(f"   {value:>18,.0f}")
+
+    print("\nquarterly revenue as filed:")
+    for period, value in f.quarterly_revenue:
+        print(f"   {period}  {value:>18,.0f}")
+
+    yoy = _quarterly_yoy(f.quarterly_revenue)
+    print("\nYoY per quarter (newest first), matched by date:")
+    periods = [p for p, _ in sorted(f.quarterly_revenue, reverse=True)]
+    for period, growth in zip(periods, yoy):
+        shown = "n/a" if growth is None else f"{growth * 100:+.1f}%"
+        print(f"   {period}  {shown}")
+    if not yoy:
+        print("   (none - no quarter had a match within 35 days of one year earlier)")
+
+    facts = extract_fundamental_facts(f, as_of)
+    print("\nderived:")
+    for key in (
+        "revenue_cagr_3y", "consecutive_growth_quarters", "rule_of_40",
+        "share_count_growth", "shares_outstanding", "market_cap",
+        "net_debt_to_ebitda", "days_since_earnings",
+    ):
+        print(f"   {key:<28} {facts.get(key)}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="gscreen")
     parser.add_argument(
         "command",
-        choices=["screen", "backtest", "prompt", "sources", "doctor", "universe"],
+        choices=[
+            "screen", "backtest", "prompt", "sources", "doctor", "universe",
+            "explain",
+        ],
     )
     parser.add_argument("--preset", default="offline", choices=sorted(PRESETS))
     parser.add_argument("--universe", choices=SOURCES["universe"])
@@ -123,6 +166,7 @@ def main() -> None:
         "--as-of", default=None, help="defaults to the last trading day"
     )
     parser.add_argument("--limit", type=int, default=None, help="cap the universe size")
+    parser.add_argument("--ticker", help="for the explain command")
     parser.add_argument("--llm", action="store_true")
     parser.add_argument("--json", action="store_true")
     parser.add_argument(
@@ -158,6 +202,12 @@ def main() -> None:
         cfg.candidates = args.limit
 
     print(f"sources: {provider.describe()}\n")
+
+    if args.command == "explain":
+        if not args.ticker:
+            raise SystemExit("explain needs --ticker")
+        explain(provider, args.ticker.upper(), as_of)
+        return
 
     if args.command == "universe":
         tickers = provider.universe(cfg.candidates)

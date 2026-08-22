@@ -47,7 +47,9 @@ class ScreenConfig:
     require_all_checks: bool = False
     # Hard ceiling on metered price lookups per run. A free Tiingo key is
     # roughly 500 symbols a month; one careless run can spend half of it.
-    max_price_calls: int | None = 60
+    # Tiingo's free tier allows roughly 50 symbols an hour; the first wide run
+    # hit HTTP 429 at about 52 calls. Stay under it.
+    max_price_calls: int | None = 45
     max_short_pct_float: float = 0.15
     min_days_since_earnings: int = 10
     candidates: int = 60
@@ -143,6 +145,7 @@ def extract_fundamental_facts(f: Fundamentals, as_of: str) -> dict:
         "ev_to_sales": f.ev_to_sales,
         "momentum_12_1": None,      # filled in later, only if worth the call
         "realised_vol_60d": None,
+        "shares_outstanding": f.annual_shares[-1] if f.annual_shares else None,
         "short_pct_float": f.short_pct_float,
         "days_since_earnings": days_since_earnings(as_of, f.last_earnings_date),
     }
@@ -151,6 +154,14 @@ def extract_fundamental_facts(f: Fundamentals, as_of: str) -> dict:
 def attach_price_facts(facts: dict, prices: list[dict]) -> dict:
     facts["momentum_12_1"] = momentum_12_1(prices)
     facts["realised_vol_60d"] = realised_volatility(prices)
+
+    # EDGAR has no market cap, so the size floor was inert and the screen was
+    # quietly ranking micro-caps. Shares outstanding x last close restores it.
+    if facts.get("market_cap") is None and prices and facts.get("shares_outstanding"):
+        facts["market_cap"] = facts["shares_outstanding"] * prices[-1]["adjusted_close"]
+        facts["market_cap_derived"] = True
+        if facts.get("revenue_ttm"):
+            facts["price_to_sales_ttm"] = facts["market_cap"] / facts["revenue_ttm"]
     return facts
 
 
@@ -298,6 +309,20 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
             )
             continue
         attach_price_facts(f, prices)
+
+        if (
+            cfg.min_market_cap
+            and f.get("market_cap") is not None
+            and f["market_cap"] < cfg.min_market_cap
+        ):
+            result.rejections.append(
+                Rejection(
+                    ticker,
+                    "size",
+                    f"market cap ${f['market_cap'] / 1e9:.2f}B below floor",
+                )
+            )
+            continue
 
         mom = f["momentum_12_1"]
         if mom is None:

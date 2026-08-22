@@ -479,3 +479,44 @@ def test_budget_rejections_name_the_limit():
     )
     budget = [r for r in result.rejections if r.stage == "budget"]
     assert budget and "budget of 1" in budget[0].reason
+
+
+
+# --------------------------------------------------------------------------
+# Market cap must be derived, not skipped
+# --------------------------------------------------------------------------
+
+
+def test_market_cap_is_derived_from_shares_and_last_close():
+    """EDGAR has no market cap, so the size floor was inert and the screen was
+    ranking micro-caps against mega-caps."""
+    from gscreen.screen import attach_price_facts
+
+    facts = {"market_cap": None, "shares_outstanding": 1_000_000_000,
+             "revenue_ttm": 2_000_000_000}
+    attach_price_facts(facts, [{"date": "2026-08-21", "adjusted_close": 25.0}])
+    assert facts["market_cap"] == 25_000_000_000
+    assert facts["market_cap_derived"] is True
+    assert facts["price_to_sales_ttm"] == pytest.approx(12.5)
+
+
+def test_supplied_market_cap_is_not_overwritten():
+    from gscreen.screen import attach_price_facts
+
+    facts = {"market_cap": 999.0, "shares_outstanding": 10, "revenue_ttm": 1}
+    attach_price_facts(facts, [{"date": "2026-08-21", "adjusted_close": 5.0}])
+    assert facts["market_cap"] == 999.0
+
+
+def test_size_floor_rejects_microcaps():
+    class Micro(FixtureProvider):
+        def fundamentals(self, ticker, as_of):
+            f = super().fundamentals(ticker, as_of)
+            f.market_cap = None
+            f.annual_shares = [1_000_000, 1_000_000]  # tiny float
+            return f
+
+    result = run_screen(
+        Micro(FIXTURES), "2026-08-15", ScreenConfig(min_market_cap=2_000_000_000)
+    )
+    assert any(r.stage == "size" for r in result.rejections)

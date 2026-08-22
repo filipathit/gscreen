@@ -92,7 +92,7 @@ def test_results_are_ranked_by_growth():
 
 def test_limit_caps_the_candidate_list():
     revenue = {i: {2022: 1e9, 2023: 2e9, 2024: 3e9, 2025: 4e9} for i in range(1, 11)}
-    tickers = {i: f"T{i}" for i in range(1, 11)}
+    tickers = {i: f"TCK{chr(64 + i)}" for i in range(1, 11)}
     frames = FakeFrames(revenue, tickers)
     assert len(frames.universe(limit=3)) == 3
     assert len(frames.universe()) == 10
@@ -231,3 +231,37 @@ def test_backtest_does_not_mangle_symbols():
     _returns(Recording(Path(__file__).resolve().parent.parent / "fixtures"),
              ["ALPHA"], "2026-02-13", 5)
     assert seen == ["ALPHA"]
+
+
+# --------------------------------------------------------------------------
+# Share-class filtering
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "ticker,keep",
+    [
+        ("NVDA", True), ("ALAB", True), ("A", True),
+        ("ANG-PD", False),   # preferred series
+        ("ATH-PA", False),   # preferred series
+        ("BRK.B", False),    # dual class suffix
+        ("VREOF", False),    # OTC foreign ordinary
+        ("JETMF", False),
+        ("LKNCY", False),    # ADR
+        ("GOOGL", True),     # five letters but not F/Y
+    ],
+)
+def test_only_common_stock_survives(ticker, keep):
+    from gscreen.frames import is_common_stock
+
+    assert is_common_stock(ticker) is keep
+
+
+def test_non_common_tickers_are_counted_in_the_funnel():
+    revenue = {
+        1: {2022: 1e9, 2023: 2e9, 2024: 3e9, 2025: 4e9},
+        2: {2022: 1e9, 2023: 2e9, 2024: 3e9, 2025: 4e9},
+    }
+    frames = FakeFrames(revenue, {1: "GOOD", 2: "ANG-PD"})
+    assert frames.universe() == ["GOOD"]
+    assert frames.report["rejected_not_common_stock"] == 1

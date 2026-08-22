@@ -30,12 +30,27 @@ from .providers import DEFAULT_UA, EDGAR_TICKERS, _Http
 FRAMES = "https://data.sec.gov/api/xbrl/frames/us-gaap"
 
 
+def is_common_stock(ticker: str) -> bool:
+    """Filter share classes a growth screen has no business ranking.
+
+    The first frames run surfaced ANG-PD and ATH-PA (preferred shares, whose
+    "revenue growth" is the issuer's, not the security's) and VREOF / JETMF
+    (five-letter OTC foreign ordinaries, thinly traded).
+    """
+    if "-" in ticker or "." in ticker:
+        return False  # preferreds, warrants, units, dual-class suffixes
+    if len(ticker) == 5 and ticker.endswith(("F", "Y")):
+        return False  # OTC foreign ordinary / ADR
+    return ticker.isalpha()
+
+
 @dataclass
 class FramesConfig:
     years: int = 3               # 3y CAGR needs years + 1 annual frames
     min_revenue: float = 50_000_000
     min_cagr: float = 0.20
     limit: int = 200             # how many candidates to hand downstream
+    common_stock_only: bool = True
     tags: list[str] = field(default_factory=lambda: list(REVENUE_TAGS))
 
 
@@ -114,7 +129,7 @@ class FramesUniverse:
 
         self.report = {"filers_with_revenue": len(by_cik)}
         scored: list[tuple[float, str]] = []
-        incomplete = small = slow = unmapped = 0
+        incomplete = small = slow = unmapped = nonequity = 0
 
         for cik, series in by_cik.items():
             start, end = series.get(first), series.get(latest)
@@ -132,6 +147,9 @@ class FramesUniverse:
             if not ticker:
                 unmapped += 1  # private filers, funds, trusts
                 continue
+            if self.cfg.common_stock_only and not is_common_stock(ticker):
+                nonequity += 1
+                continue
             scored.append((cagr, ticker))
 
         self.report.update(
@@ -140,6 +158,7 @@ class FramesUniverse:
                 "rejected_too_small": small,
                 "rejected_slow_growth": slow,
                 "rejected_no_ticker": unmapped,
+                "rejected_not_common_stock": nonequity,
                 "candidates": len(scored),
             }
         )
