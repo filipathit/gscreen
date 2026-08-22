@@ -37,6 +37,7 @@ YAHOO_QUOTE = "https://query1.finance.yahoo.com/v7/finance/quote"
 EDGAR_FACTS = "https://data.sec.gov/api/xbrl/companyfacts"
 EDGAR_TICKERS = "https://www.sec.gov/files/company_tickers.json"
 STOOQ_CSV = "https://stooq.com/q/d/l/"
+TIINGO_DAILY = "https://api.tiingo.com/tiingo/daily"
 
 DEFAULT_UA = os.environ.get(
     "SEC_USER_AGENT", "gscreen research script (set SEC_USER_AGENT to your email)"
@@ -50,7 +51,7 @@ class FetchError(RuntimeError):
         self.url = url
         self.status = status
         self.detail = detail
-        shown = f"HTTP {status}" if status else "no response"
+        shown = f"HTTP {status}" if status else "bad response"
         super().__init__(f"{shown} - {detail} ({url.split('?')[0]})")
 
 
@@ -372,6 +373,60 @@ def parse_stooq_csv(
     return out
 
 
+class TiingoPrices:
+    """Split- and dividend-adjusted daily closes, free tier, token auth.
+
+    Why this exists: Yahoo and Stooq both identify callers by IP and both
+    refused our CI runner - Yahoo with a 429, Stooq with a bot-challenge page.
+    A keyed API authenticates the caller instead of fingerprinting the host,
+    which is precisely what makes it work from a shared runner.
+
+    Free tier is roughly 500 unique symbols a month with decades of history,
+    and is personal-use only - the same redistribution limits as everything
+    else here.
+    """
+
+    def __init__(self, api_key: str | None = None, cache_dir="_cache/tiingo") -> None:
+        self.api_key = api_key or os.environ.get("TIINGO_API_KEY")
+        if not self.api_key:
+            raise RuntimeError(
+                "TIINGO_API_KEY is not set. Free key: https://www.tiingo.com "
+                "(or use --prices stooq / yahoo, which do not need one but are "
+                "blocked from most cloud IPs)."
+            )
+        self.http = _Http(
+            cache_dir=cache_dir,
+            min_interval=0.4,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Token {self.api_key}",
+            },
+        )
+
+    def eod_prices(self, ticker: str, start: str, end: str) -> list[dict]:
+        payload = self.http.get_json(
+            f"{TIINGO_DAILY}/{ticker}/prices",
+            {"startDate": start, "endDate": end, "format": "json"},
+        )
+        return parse_tiingo(payload)
+
+
+def parse_tiingo(payload) -> list[dict]:
+    """Tiingo returns adjClose already adjusted for splits AND dividends,
+    which is what a momentum calculation actually wants."""
+    if not isinstance(payload, list):
+        return []
+    out = []
+    for row in payload:
+        day = (row.get("date") or "")[:10]
+        close = row.get("adjClose", row.get("close"))
+        if not day or close is None:
+            continue
+        out.append({"date": day, "adjusted_close": float(close)})
+    out.sort(key=lambda r: r["date"])
+    return out
+
+
 # --------------------------------------------------------------------------
 # EDGAR (free, official, point-in-time)
 # --------------------------------------------------------------------------
@@ -508,16 +563,18 @@ class CompositeProvider:
 
 SOURCES = {
     "universe": ("eodhd", "static", "fixture"),
-    "prices": ("eodhd", "yahoo", "stooq", "fixture"),
+    "prices": ("eodhd", "tiingo", "yahoo", "stooq", "fixture"),
     "fundamentals": ("eodhd", "edgar", "fixture"),
 }
 
 PRESETS = {
     # name: (universe, prices, fundamentals)
     "offline": ("fixture", "fixture", "fixture"),
-    # Stooq rather than Yahoo by default: Yahoo throttles shared cloud IPs,
-    # which is exactly what a CI runner is. Use --prices yahoo to override.
-    "free": ("static", "stooq", "edgar"),
+    # Tiingo by default: it is the only free price source that works from a
+    # CI runner, because it authenticates by token rather than by IP. Yahoo
+    # (429) and Stooq (bot-challenge page) both refused ours.
+    "free": ("static", "tiingo", "edgar"),
+    "free-stooq": ("static", "stooq", "edgar"),
     "free-yahoo": ("static", "yahoo", "edgar"),
     "paid": ("eodhd", "eodhd", "eodhd"),
     "hybrid": ("eodhd", "eodhd", "edgar"),  # paid discovery, honest fundamentals
@@ -550,6 +607,7 @@ def build_provider(
 
     price_source = {
         "eodhd": get_eodhd,
+        "tiingo": TiingoPrices,
         "yahoo": YahooPrices,
         "stooq": StooqPrices,
         "fixture": get_fixture,

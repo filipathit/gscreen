@@ -51,6 +51,7 @@ def doctor(args) -> None:
         EdgarFundamentals,
         StaticUniverse,
         StooqPrices,
+        TiingoPrices,
         YahooPrices,
     )
 
@@ -76,6 +77,7 @@ def doctor(args) -> None:
         enough = "enough" if len(rows) >= 274 else "TOO FEW for 12-1"
         return f"{len(rows)} rows, {rows[0]['date']}..{rows[-1]['date']} ({enough})"
 
+    check("prices (tiingo)", lambda: describe_series(TiingoPrices()))
     check("prices (stooq)", lambda: describe_series(StooqPrices()))
     check("prices (yahoo)", lambda: describe_series(YahooPrices()))
 
@@ -90,7 +92,8 @@ def doctor(args) -> None:
     )
     print(
         "\nA 403 from EDGAR usually means SEC_USER_AGENT is unset or generic."
-        "\nA 429 from Yahoo is throttling - use --prices stooq instead."
+        "\nAn HTML body from Stooq or a 429 from Yahoo means the host refused"
+        "\nthis IP; both fingerprint by IP. Tiingo uses a token and does not."
         "\n12-1 momentum needs 274 daily closes (~13 months); a short series"
         "\nmeans the price source truncated the range, not that the screen failed."
     )

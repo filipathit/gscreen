@@ -16,7 +16,7 @@ on:
       preset:
         description: "Data sources"
         type: choice
-        options: [free, offline, paid, hybrid]
+        options: [free, free-stooq, free-yahoo, offline, paid, hybrid]
         default: free
       limit:
         description: "Max tickers to fetch (keep small on free sources)"
@@ -55,8 +55,14 @@ jobs:
         id: cfg
         env:
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
+          TIINGO_API_KEY: ${{ secrets.TIINGO_API_KEY }}
         run: |
           PRESET="${{ inputs.preset || 'free' }}"
+          if [ "$PRESET" = "free" ] && [ -z "$TIINGO_API_KEY" ]; then
+            echo "::error::preset 'free' needs a TIINGO_API_KEY secret (free key at tiingo.com)."
+            echo "::notice::Yahoo and Stooq are IP-blocked from GitHub runners, so there is no keyless option here."
+            exit 1
+          fi
           # paid/hybrid need a key; fall back rather than fail the schedule
           if [ "$PRESET" = "paid" ] || [ "$PRESET" = "hybrid" ]; then
             if [ -z "$EODHD_API_KEY" ]; then
@@ -72,6 +78,7 @@ jobs:
         continue-on-error: true
         env:
           SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT || 'gscreen research script' }}
+          TIINGO_API_KEY: ${{ secrets.TIINGO_API_KEY }}
         run: |
           {
             echo '## Source check'
@@ -83,6 +90,7 @@ jobs:
       - name: Run screen
         env:
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
+          TIINGO_API_KEY: ${{ secrets.TIINGO_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # SEC asks for a contact address in the User-Agent.
           SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT || 'gscreen research script' }}

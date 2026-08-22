@@ -151,10 +151,9 @@ def test_every_preset_names_valid_sources():
         assert fundamentals in SOURCES["fundamentals"], name
 
 
-def test_free_preset_defaults_to_stooq_not_yahoo():
-    """Yahoo throttles shared cloud IPs, which is what CI runs on."""
-    assert PRESETS["free"] == ("static", "stooq", "edgar")
-    assert PRESETS["free-yahoo"] == ("static", "yahoo", "edgar")
+def test_free_preset_is_not_an_ip_fingerprinted_source():
+    """Yahoo and Stooq both refused our CI runner by IP."""
+    assert PRESETS["free"][1] not in ("yahoo", "stooq")
     assert PRESETS["paid"] == ("eodhd", "eodhd", "eodhd")
 
 
@@ -288,3 +287,50 @@ def test_default_as_of_is_a_trading_day():
     for day in range(1, 29):
         as_of, _ = resolve_as_of(None, today=date(2026, 8, day))
         assert is_trading_day(as_of), day
+
+
+# --------------------------------------------------------------------------
+# Tiingo
+# --------------------------------------------------------------------------
+
+
+def test_tiingo_prefers_adjusted_close():
+    from gscreen.providers import parse_tiingo
+
+    rows = parse_tiingo(
+        [
+            {"date": "2025-01-03T00:00:00.000Z", "close": 11.0, "adjClose": 10.1},
+            {"date": "2025-01-02T00:00:00.000Z", "close": 10.0, "adjClose": 9.8},
+        ]
+    )
+    assert [r["date"] for r in rows] == ["2025-01-02", "2025-01-03"]
+    assert rows[0]["adjusted_close"] == 9.8  # adjusted, not raw close
+
+
+def test_tiingo_handles_error_payloads():
+    from gscreen.providers import parse_tiingo
+
+    assert parse_tiingo({"detail": "Not authorised"}) == []
+    assert parse_tiingo([]) == []
+    assert parse_tiingo([{"date": "2025-01-02T00:00:00.000Z"}]) == []
+
+
+def test_tiingo_requires_a_key_and_says_where_to_get_one():
+    import os
+
+    from gscreen.providers import TiingoPrices
+
+    saved = os.environ.pop("TIINGO_API_KEY", None)
+    try:
+        with pytest.raises(RuntimeError) as exc:
+            TiingoPrices()
+        assert "tiingo.com" in str(exc.value)
+    finally:
+        if saved:
+            os.environ["TIINGO_API_KEY"] = saved
+
+
+def test_free_preset_uses_the_only_ci_viable_price_source():
+    assert PRESETS["free"] == ("static", "tiingo", "edgar")
+    assert PRESETS["free-stooq"] == ("static", "stooq", "edgar")
+    assert PRESETS["free-yahoo"] == ("static", "yahoo", "edgar")

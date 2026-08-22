@@ -31,11 +31,22 @@ that standard. This does, and enforces it in code.
 
 Three capabilities, each swappable independently:
 
-| | eodhd | stooq | yahoo | edgar | static | fixture |
-|---|---|---|---|---|---|---|
-| universe | screener | – | – | – | `universe.txt` | offline |
-| prices | paid | free, CI-friendly | free, deep history | – | – | offline |
-| fundamentals | paid snapshot | – | – | **free, point-in-time** | – | offline |
+| | eodhd | tiingo | stooq | yahoo | edgar | static | fixture |
+|---|---|---|---|---|---|---|---|
+| universe | screener | – | – | – | – | `universe.txt` | offline |
+| prices | paid | **free key, works from CI** | free, IP-blocked from CI | free, IP-blocked from CI | – | – | offline |
+| fundamentals | paid snapshot | – | – | – | **free, point-in-time** | – | offline |
+
+### Why the free price source needs a key
+
+Yahoo and Stooq are both free and keyless, and both refused a GitHub Actions
+runner: Yahoo with `HTTP 429`, Stooq with a JavaScript bot-challenge page
+served in place of the CSV. They identify callers by IP, and a CI runner is a
+shared datacenter IP. Tiingo authenticates by token, so the runner is
+irrelevant. That is the whole reason `free` needs a (free, no-card) key.
+
+Both keyless sources remain selectable — `--preset free-stooq`,
+`--preset free-yahoo` — and work fine from a laptop.
 
 Presets are shorthand; any flag overrides the preset:
 
@@ -90,6 +101,7 @@ pip install requests pytest
 export EODHD_API_KEY=...        # only for the paid/hybrid presets
 export ANTHROPIC_API_KEY=...    # only for --llm
 export SEC_USER_AGENT="you@example.com"   # EDGAR asks for a contact address
+export TIINGO_API_KEY=...       # free key, needed by the `free` preset
 
 PYTHONPATH=. python -m gscreen.cli screen   --preset offline
 PYTHONPATH=. python -m gscreen.cli backtest --preset free
