@@ -1,0 +1,65 @@
+[
+ {
+  "code": "ALPHA",
+  "name": "Alpha Compounders",
+  "exchange": "us",
+  "market_capitalization": 22800000000.0,
+  "avgvol_200d": 3000000
+ },
+ {
+  "code": "BRAVO",
+  "name": "Bravo Networks",
+  "exchange": "us",
+  "market_capitalization": 17550000000.0,
+  "avgvol_200d": 3250000
+ },
+ {
+  "code": "CHARL",
+  "name": "Charlie Leverage",
+  "exchange": "us",
+  "market_capitalization": 54000000000.0,
+  "avgvol_200d": 3500000
+ },
+ {
+  "code": "DELTA",
+  "name": "Delta One-Quarter",
+  "exchange": "us",
+  "market_capitalization": 25300000000.0,
+  "avgvol_200d": 3750000
+ },
+ {
+  "code": "ECHO",
+  "name": "Echo Dilution",
+  "exchange": "us",
+  "market_capitalization": 21600000000.0,
+  "avgvol_200d": 4000000
+ },
+ {
+  "code": "FOXTR",
+  "name": "Foxtrot Squeeze",
+  "exchange": "us",
+  "market_capitalization": 23400000000.0,
+  "avgvol_200d": 4250000
+ },
+ {
+  "code": "GOLF",
+  "name": "Golf Recent Print",
+  "exchange": "us",
+  "market_capitalization": 32200000000.0,
+  "avgvol_200d": 4500000
+ },
+ {
+  "code": "HOTEL",
+  "name": "Hotel Slow Grower",
+  "exchange": "us",
+  "market_capitalization": 36000000000.0,
+  "avgvol_200d": 4750000
+ },
+ {
+  "code": "INDIA",
+  "name": "India Flat Momentum",
+  "exchange": "us",
+  "market_capitalization": 35200000000.0,
+  "avgvol_200d": 5000000
+ }
+]

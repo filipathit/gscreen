@@ -1,0 +1,1073 @@
+{
+ "ALPHA": {
+  "General": {
+   "Name": "Alpha Compounders",
+   "Sector": "Technology",
+   "Code": "ALPHA"
+  },
+  "Highlights": {
+   "MarketCapitalization": 22800000000.0,
+   "EBITDA": 855000000.0,
+   "ProfitMargin": 0.14,
+   "QuarterlyRevenueGrowthYOY": 0.38
+  },
+  "Valuation": {
+   "PriceSalesTTM": 8.0,
+   "EnterpriseValueRevenue": 7.47
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.03
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-05"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "1000000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1450000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "2049999999.9999998"
+     },
+     "2026-12-31": {
+      "totalRevenue": "2850000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "475000000.00000006"
+     },
+     "2024-01-04": {
+      "totalRevenue": "485326086.9565218"
+     },
+     "2024-04-04": {
+      "totalRevenue": "495652173.91304356"
+     },
+     "2024-07-04": {
+      "totalRevenue": "505978260.86956525"
+     },
+     "2024-10-03": {
+      "totalRevenue": "603250000.0000001"
+     },
+     "2025-01-02": {
+      "totalRevenue": "616364130.4347827"
+     },
+     "2025-04-03": {
+      "totalRevenue": "629478260.8695654"
+     },
+     "2025-07-03": {
+      "totalRevenue": "652711956.5217392"
+     },
+     "2025-10-02": {
+      "totalRevenue": "790257500.0000002"
+     },
+     "2026-01-01": {
+      "totalRevenue": "819764293.4782611"
+     },
+     "2026-04-02": {
+      "totalRevenue": "856090434.7826089"
+     },
+     "2026-07-02": {
+      "totalRevenue": "900742500.0000001"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1900000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1020000000.0",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1900000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1040400000.0",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1900000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1061208000.0000001",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1900000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "220000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "319000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "450999999.99999994"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "627000000.0"
+     }
+    }
+   }
+  }
+ },
+ "BRAVO": {
+  "General": {
+   "Name": "Bravo Networks",
+   "Sector": "Communication Services",
+   "Code": "BRAVO"
+  },
+  "Highlights": {
+   "MarketCapitalization": 17550000000.0,
+   "EBITDA": 507000000.0,
+   "ProfitMargin": 0.11,
+   "QuarterlyRevenueGrowthYOY": 0.32
+  },
+  "Valuation": {
+   "PriceSalesTTM": 9.0,
+   "EnterpriseValueRevenue": 8.69
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.05
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-11"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "800000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1100000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "1500000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "1950000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "339772727.2727273"
+     },
+     "2024-01-04": {
+      "totalRevenue": "347159090.90909094"
+     },
+     "2024-04-04": {
+      "totalRevenue": "354545454.54545456"
+     },
+     "2024-07-04": {
+      "totalRevenue": "361931818.1818182"
+     },
+     "2024-10-03": {
+      "totalRevenue": "414522727.2727273"
+     },
+     "2025-01-02": {
+      "totalRevenue": "423534090.90909094"
+     },
+     "2025-04-03": {
+      "totalRevenue": "432545454.54545456"
+     },
+     "2025-07-03": {
+      "totalRevenue": "448795454.54545456"
+     },
+     "2025-10-02": {
+      "totalRevenue": "522298636.36363643"
+     },
+     "2026-01-01": {
+      "totalRevenue": "542123636.3636364"
+     },
+     "2026-04-02": {
+      "totalRevenue": "562309090.909091"
+     },
+     "2026-07-02": {
+      "totalRevenue": "592410000.0"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "600000000.0",
+      "cashAndShortTermInvestments": "1200000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1030000000.0",
+      "shortLongTermDebtTotal": "600000000.0",
+      "cashAndShortTermInvestments": "1200000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1060900000.0",
+      "shortLongTermDebtTotal": "600000000.0",
+      "cashAndShortTermInvestments": "1200000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1092727000.0",
+      "shortLongTermDebtTotal": "600000000.0",
+      "cashAndShortTermInvestments": "1200000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "144000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "198000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "270000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "351000000.0"
+     }
+    }
+   }
+  }
+ },
+ "CHARL": {
+  "General": {
+   "Name": "Charlie Leverage",
+   "Sector": "Technology",
+   "Code": "CHARL"
+  },
+  "Highlights": {
+   "MarketCapitalization": 54000000000.0,
+   "EBITDA": 108000000.0,
+   "ProfitMargin": -0.18,
+   "QuarterlyRevenueGrowthYOY": 1.12
+  },
+  "Valuation": {
+   "PriceSalesTTM": 10.0,
+   "EnterpriseValueRevenue": 12.98
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.09
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-18"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "500000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1200000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "2600000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "5400000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "585849056.6037736"
+     },
+     "2024-01-04": {
+      "totalRevenue": "598584905.6603774"
+     },
+     "2024-04-04": {
+      "totalRevenue": "611320754.7169812"
+     },
+     "2024-07-04": {
+      "totalRevenue": "624056603.7735848"
+     },
+     "2024-10-03": {
+      "totalRevenue": "995943396.226415"
+     },
+     "2025-01-02": {
+      "totalRevenue": "1017594339.6226416"
+     },
+     "2025-04-03": {
+      "totalRevenue": "1039245283.018868"
+     },
+     "2025-07-03": {
+      "totalRevenue": "1135783018.8679242"
+     },
+     "2025-10-02": {
+      "totalRevenue": "1892292452.8301885"
+     },
+     "2026-01-01": {
+      "totalRevenue": "2014836792.4528303"
+     },
+     "2026-04-02": {
+      "totalRevenue": "2130452830.1886792"
+     },
+     "2026-07-02": {
+      "totalRevenue": "2407859999.9999995"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "17200000000.0",
+      "cashAndShortTermInvestments": "1100000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1060000000.0",
+      "shortLongTermDebtTotal": "17200000000.0",
+      "cashAndShortTermInvestments": "1100000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1123600000.0000002",
+      "shortLongTermDebtTotal": "17200000000.0",
+      "cashAndShortTermInvestments": "1100000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1191016000.0",
+      "shortLongTermDebtTotal": "17200000000.0",
+      "cashAndShortTermInvestments": "1100000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "-175000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "-420000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "-910000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "-1889999999.9999998"
+     }
+    }
+   }
+  }
+ },
+ "DELTA": {
+  "General": {
+   "Name": "Delta One-Quarter",
+   "Sector": "Industrials",
+   "Code": "DELTA"
+  },
+  "Highlights": {
+   "MarketCapitalization": 25300000000.0,
+   "EBITDA": 299000000.0,
+   "ProfitMargin": 0.03,
+   "QuarterlyRevenueGrowthYOY": 0.44
+  },
+  "Valuation": {
+   "PriceSalesTTM": 11.0,
+   "EnterpriseValueRevenue": 11.09
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.07
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-06-24"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "1400000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1500000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "1600000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "2300000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "367361111.11111116"
+     },
+     "2024-01-04": {
+      "totalRevenue": "375347222.22222227"
+     },
+     "2024-04-04": {
+      "totalRevenue": "383333333.3333334"
+     },
+     "2024-07-04": {
+      "totalRevenue": "391319444.4444445"
+     },
+     "2024-10-03": {
+      "totalRevenue": "385729166.66666675"
+     },
+     "2025-01-02": {
+      "totalRevenue": "394114583.3333334"
+     },
+     "2025-04-03": {
+      "totalRevenue": "402500000.00000006"
+     },
+     "2025-07-03": {
+      "totalRevenue": "403059027.77777785"
+     },
+     "2025-10-02": {
+      "totalRevenue": "381871875.00000006"
+     },
+     "2026-01-01": {
+      "totalRevenue": "401996875.00000006"
+     },
+     "2026-04-02": {
+      "totalRevenue": "418600000.00000006"
+     },
+     "2026-07-02": {
+      "totalRevenue": "580405000.0000001"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "1000000000.0",
+      "cashAndShortTermInvestments": "800000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1040000000.0",
+      "shortLongTermDebtTotal": "1000000000.0",
+      "cashAndShortTermInvestments": "800000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1081600000.0",
+      "shortLongTermDebtTotal": "1000000000.0",
+      "cashAndShortTermInvestments": "800000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1124864000.0",
+      "shortLongTermDebtTotal": "1000000000.0",
+      "cashAndShortTermInvestments": "800000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "70000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "75000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "80000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "115000000.0"
+     }
+    }
+   }
+  }
+ },
+ "ECHO": {
+  "General": {
+   "Name": "Echo Dilution",
+   "Sector": "Healthcare",
+   "Code": "ECHO"
+  },
+  "Highlights": {
+   "MarketCapitalization": 21600000000.0,
+   "EBITDA": 36000000.0,
+   "ProfitMargin": -0.06,
+   "QuarterlyRevenueGrowthYOY": 0.4
+  },
+  "Valuation": {
+   "PriceSalesTTM": 12.0,
+   "EnterpriseValueRevenue": 11.39
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.11
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-13"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "600000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "900000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "1300000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "1800000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "295714285.71428573"
+     },
+     "2024-01-04": {
+      "totalRevenue": "302142857.1428572"
+     },
+     "2024-04-04": {
+      "totalRevenue": "308571428.57142866"
+     },
+     "2024-07-04": {
+      "totalRevenue": "315000000.0"
+     },
+     "2024-10-03": {
+      "totalRevenue": "378514285.71428573"
+     },
+     "2025-01-02": {
+      "totalRevenue": "386742857.1428572"
+     },
+     "2025-04-03": {
+      "totalRevenue": "394971428.5714287"
+     },
+     "2025-07-03": {
+      "totalRevenue": "409500000.0"
+     },
+     "2025-10-02": {
+      "totalRevenue": "503424000.00000006"
+     },
+     "2026-01-01": {
+      "totalRevenue": "522102857.14285725"
+     },
+     "2026-04-02": {
+      "totalRevenue": "545060571.4285716"
+     },
+     "2026-07-02": {
+      "totalRevenue": "573300000.0"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "300000000.0",
+      "cashAndShortTermInvestments": "1400000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1190000000.0",
+      "shortLongTermDebtTotal": "300000000.0",
+      "cashAndShortTermInvestments": "1400000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1416100000.0",
+      "shortLongTermDebtTotal": "300000000.0",
+      "cashAndShortTermInvestments": "1400000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1685158999.9999998",
+      "shortLongTermDebtTotal": "300000000.0",
+      "cashAndShortTermInvestments": "1400000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "-60000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "-90000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "-130000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "-180000000.0"
+     }
+    }
+   }
+  }
+ },
+ "FOXTR": {
+  "General": {
+   "Name": "Foxtrot Squeeze",
+   "Sector": "Consumer Cyclical",
+   "Code": "FOXTR"
+  },
+  "Highlights": {
+   "MarketCapitalization": 23400000000.0,
+   "EBITDA": 306000000.0,
+   "ProfitMargin": 0.05,
+   "QuarterlyRevenueGrowthYOY": 0.33
+  },
+  "Valuation": {
+   "PriceSalesTTM": 13.0,
+   "EnterpriseValueRevenue": 12.78
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.24
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-07"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "700000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1000000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "1350000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "1800000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "311278195.4887218"
+     },
+     "2024-01-04": {
+      "totalRevenue": "318045112.7819549"
+     },
+     "2024-04-04": {
+      "totalRevenue": "324812030.075188"
+     },
+     "2024-07-04": {
+      "totalRevenue": "331578947.368421"
+     },
+     "2024-10-03": {
+      "totalRevenue": "385984962.40601504"
+     },
+     "2025-01-02": {
+      "totalRevenue": "394375939.84962404"
+     },
+     "2025-04-03": {
+      "totalRevenue": "402766917.2932331"
+     },
+     "2025-07-03": {
+      "totalRevenue": "417789473.6842105"
+     },
+     "2025-10-02": {
+      "totalRevenue": "490200902.2556391"
+     },
+     "2026-01-01": {
+      "totalRevenue": "508744962.40601504"
+     },
+     "2026-04-02": {
+      "totalRevenue": "527624661.6541354"
+     },
+     "2026-07-02": {
+      "totalRevenue": "555660000.0"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "500000000.0",
+      "cashAndShortTermInvestments": "900000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1020000000.0",
+      "shortLongTermDebtTotal": "500000000.0",
+      "cashAndShortTermInvestments": "900000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1040400000.0",
+      "shortLongTermDebtTotal": "500000000.0",
+      "cashAndShortTermInvestments": "900000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1061208000.0000001",
+      "shortLongTermDebtTotal": "500000000.0",
+      "cashAndShortTermInvestments": "900000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "63000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "90000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "121500000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "162000000.0"
+     }
+    }
+   }
+  }
+ },
+ "GOLF": {
+  "General": {
+   "Name": "Golf Recent Print",
+   "Sector": "Technology",
+   "Code": "GOLF"
+  },
+  "Highlights": {
+   "MarketCapitalization": 32200000000.0,
+   "EBITDA": 552000000.0,
+   "ProfitMargin": 0.1,
+   "QuarterlyRevenueGrowthYOY": 0.35
+  },
+  "Valuation": {
+   "PriceSalesTTM": 14.0,
+   "EnterpriseValueRevenue": 13.65
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.06
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-08-11"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "900000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1250000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "1700000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "2300000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "391851851.8518519"
+     },
+     "2024-01-04": {
+      "totalRevenue": "400370370.3703704"
+     },
+     "2024-04-04": {
+      "totalRevenue": "408888888.8888889"
+     },
+     "2024-07-04": {
+      "totalRevenue": "417407407.4074074"
+     },
+     "2024-10-03": {
+      "totalRevenue": "489814814.81481487"
+     },
+     "2025-01-02": {
+      "totalRevenue": "500462962.962963"
+     },
+     "2025-04-03": {
+      "totalRevenue": "511111111.1111111"
+     },
+     "2025-07-03": {
+      "totalRevenue": "530107407.4074074"
+     },
+     "2025-10-02": {
+      "totalRevenue": "631861111.1111112"
+     },
+     "2026-01-01": {
+      "totalRevenue": "655606481.4814816"
+     },
+     "2026-04-02": {
+      "totalRevenue": "679777777.7777778"
+     },
+     "2026-07-02": {
+      "totalRevenue": "715645000.0"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "700000000.0",
+      "cashAndShortTermInvestments": "1500000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1030000000.0",
+      "shortLongTermDebtTotal": "700000000.0",
+      "cashAndShortTermInvestments": "1500000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1060900000.0",
+      "shortLongTermDebtTotal": "700000000.0",
+      "cashAndShortTermInvestments": "1500000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1092727000.0",
+      "shortLongTermDebtTotal": "700000000.0",
+      "cashAndShortTermInvestments": "1500000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "144000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "200000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "272000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "368000000.0"
+     }
+    }
+   }
+  }
+ },
+ "HOTEL": {
+  "General": {
+   "Name": "Hotel Slow Grower",
+   "Sector": "Consumer Defensive",
+   "Code": "HOTEL"
+  },
+  "Highlights": {
+   "MarketCapitalization": 36000000000.0,
+   "EBITDA": 480000000.0,
+   "ProfitMargin": 0.08,
+   "QuarterlyRevenueGrowthYOY": 0.07
+  },
+  "Valuation": {
+   "PriceSalesTTM": 15.0,
+   "EnterpriseValueRevenue": 15.21
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.04
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-02"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "2000000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "2100000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "2250000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "2400000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "515887850.46728975"
+     },
+     "2024-01-04": {
+      "totalRevenue": "527102803.7383178"
+     },
+     "2024-04-04": {
+      "totalRevenue": "538317757.0093458"
+     },
+     "2024-07-04": {
+      "totalRevenue": "549532710.2803738"
+     },
+     "2024-10-03": {
+      "totalRevenue": "536523364.48598135"
+     },
+     "2025-01-02": {
+      "totalRevenue": "548186915.8878505"
+     },
+     "2025-04-03": {
+      "totalRevenue": "559850467.2897196"
+     },
+     "2025-07-03": {
+      "totalRevenue": "577009345.7943926"
+     },
+     "2025-10-02": {
+      "totalRevenue": "563349532.7102804"
+     },
+     "2026-01-01": {
+      "totalRevenue": "581078130.8411216"
+     },
+     "2026-04-02": {
+      "totalRevenue": "593441495.3271028"
+     },
+     "2026-07-02": {
+      "totalRevenue": "617400000.0000001"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "1100000000.0",
+      "cashAndShortTermInvestments": "600000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1010000000.0",
+      "shortLongTermDebtTotal": "1100000000.0",
+      "cashAndShortTermInvestments": "600000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1020100000.0",
+      "shortLongTermDebtTotal": "1100000000.0",
+      "cashAndShortTermInvestments": "600000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1030301000.0000001",
+      "shortLongTermDebtTotal": "1100000000.0",
+      "cashAndShortTermInvestments": "600000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "240000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "252000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "270000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "288000000.0"
+     }
+    }
+   }
+  }
+ },
+ "INDIA": {
+  "General": {
+   "Name": "India Flat Momentum",
+   "Sector": "Technology",
+   "Code": "INDIA"
+  },
+  "Highlights": {
+   "MarketCapitalization": 35200000000.0,
+   "EBITDA": 616000000.0,
+   "ProfitMargin": 0.13,
+   "QuarterlyRevenueGrowthYOY": 0.36
+  },
+  "Valuation": {
+   "PriceSalesTTM": 16.0,
+   "EnterpriseValueRevenue": 15.59
+  },
+  "SharesStats": {
+   "ShortPercentFloat": 0.05
+  },
+  "Earnings": {
+   "Last_Reported_Date": "2026-07-09"
+  },
+  "Financials": {
+   "Income_Statement": {
+    "yearly": {
+     "2023-12-31": {
+      "totalRevenue": "800000000.0"
+     },
+     "2024-12-31": {
+      "totalRevenue": "1150000000.0"
+     },
+     "2025-12-31": {
+      "totalRevenue": "1600000000.0"
+     },
+     "2026-12-31": {
+      "totalRevenue": "2200000000.0"
+     }
+    },
+    "quarterly": {
+     "2023-10-05": {
+      "totalRevenue": "372058823.5294118"
+     },
+     "2024-01-04": {
+      "totalRevenue": "380147058.8235294"
+     },
+     "2024-04-04": {
+      "totalRevenue": "388235294.1176471"
+     },
+     "2024-07-04": {
+      "totalRevenue": "396323529.41176474"
+     },
+     "2024-10-03": {
+      "totalRevenue": "468794117.64705884"
+     },
+     "2025-01-02": {
+      "totalRevenue": "478985294.11764705"
+     },
+     "2025-04-03": {
+      "totalRevenue": "489176470.5882354"
+     },
+     "2025-07-03": {
+      "totalRevenue": "507294117.6470589"
+     },
+     "2025-10-02": {
+      "totalRevenue": "609432352.9411765"
+     },
+     "2026-01-01": {
+      "totalRevenue": "632260588.2352941"
+     },
+     "2026-04-02": {
+      "totalRevenue": "655496470.5882355"
+     },
+     "2026-07-02": {
+      "totalRevenue": "689920000.0"
+     }
+    }
+   },
+   "Balance_Sheet": {
+    "yearly": {
+     "2023-12-31": {
+      "commonStockSharesOutstanding": "1000000000.0",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1300000000.0"
+     },
+     "2024-12-31": {
+      "commonStockSharesOutstanding": "1020000000.0",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1300000000.0"
+     },
+     "2025-12-31": {
+      "commonStockSharesOutstanding": "1040400000.0",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1300000000.0"
+     },
+     "2026-12-31": {
+      "commonStockSharesOutstanding": "1061208000.0000001",
+      "shortLongTermDebtTotal": "400000000.0",
+      "cashAndShortTermInvestments": "1300000000.0"
+     }
+    }
+   },
+   "Cash_Flow": {
+    "yearly": {
+     "2023-12-31": {
+      "freeCashFlow": "160000000.0"
+     },
+     "2024-12-31": {
+      "freeCashFlow": "230000000.0"
+     },
+     "2025-12-31": {
+      "freeCashFlow": "320000000.0"
+     },
+     "2026-12-31": {
+      "freeCashFlow": "440000000.0"
+     }
+    }
+   }
+  }
+ }
+}

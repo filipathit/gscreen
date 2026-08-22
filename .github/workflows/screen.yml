@@ -1,0 +1,72 @@
+name: screen
+
+# Runs the live screen on a schedule and commits the result, so you can read
+# it in the GitHub mobile app without a machine. Falls back to fixture data
+# if no EODHD key is configured, so the job never silently does nothing.
+
+on:
+  schedule:
+    - cron: "30 21 * * 1-5"   # 21:30 UTC weekdays, after the US close
+  workflow_dispatch:
+    inputs:
+      use_llm:
+        description: "Run the model stage and enforce grounding"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Pick provider
+        id: mode
+        env:
+          EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
+        run: |
+          if [ -n "$EODHD_API_KEY" ]; then
+            echo "provider=eodhd" >> "$GITHUB_OUTPUT"
+          else
+            echo "provider=fixture" >> "$GITHUB_OUTPUT"
+            echo "::notice::No EODHD_API_KEY secret set - running on fixture data."
+          fi
+
+      - name: Run screen
+        env:
+          EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -o pipefail
+          DATE=$(date -u +%F)
+          mkdir -p results
+          LLM=""
+          if [ "${{ inputs.use_llm }}" = "true" ] && [ -n "$ANTHROPIC_API_KEY" ]; then
+            LLM="--llm"
+          fi
+          PYTHONPATH=. python -m gscreen.cli screen \
+            --provider ${{ steps.mode.outputs.provider }} \
+            --as-of "$DATE" $LLM | tee "results/$DATE.txt"
+          {
+            echo "## Screen $DATE (${{ steps.mode.outputs.provider }})"
+            echo '```'
+            cat "results/$DATE.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results
+          git diff --staged --quiet || git commit -m "screen: $(date -u +%F)"
+          git push
