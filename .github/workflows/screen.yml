@@ -18,6 +18,10 @@ on:
         type: choice
         options: [free, offline, paid, hybrid]
         default: free
+      limit:
+        description: "Max tickers to fetch (keep small on free sources)"
+        type: string
+        default: "10"
       use_llm:
         description: "Run the model stage and enforce grounding"
         type: boolean
@@ -37,6 +41,15 @@ jobs:
           python-version: "3.12"
 
       - run: pip install -r requirements.txt
+
+      # Cache fetched responses for the day. Reruns then cost no extra
+      # requests, which matters most for Yahoo's throttling.
+      - uses: actions/cache@v4
+        with:
+          path: _cache
+          key: data-${{ github.run_id }}
+          restore-keys: |
+            data-
 
       - name: Resolve preset
         id: cfg
@@ -67,8 +80,10 @@ jobs:
           if [ "${{ inputs.use_llm }}" = "true" ] && [ -n "$ANTHROPIC_API_KEY" ]; then
             LLM="--llm"
           fi
+          LIMIT="${{ inputs.limit || '10' }}"
           PYTHONPATH=. python -m gscreen.cli screen \
             --preset "${{ steps.cfg.outputs.preset }}" \
+            --limit "$LIMIT" \
             --as-of "$DATE" $LLM | tee "results/$DATE.txt"
           {
             echo "## Screen $DATE (preset: ${{ steps.cfg.outputs.preset }})"
