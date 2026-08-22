@@ -432,3 +432,50 @@ def test_stale_tickers_are_detected_against_the_sec_index():
         path.write_text("AAPL\nMSFT\nSQ\nDELISTED\n")
         stale = StaticUniverse(path).unknown_to_sec(FakeEdgar())
     assert stale == ["SQ", "DELISTED"]
+
+
+# --------------------------------------------------------------------------
+# Metered calls must be spent last and capped
+# --------------------------------------------------------------------------
+
+
+def test_prices_are_only_fetched_for_durability_survivors():
+    """Tiingo's free tier is ~500 symbols a month. Fetching the whole universe
+    spends it on companies that fail on fundamentals anyway."""
+    calls = []
+
+    class Counting(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            calls.append(ticker)
+            return super().eod_prices(ticker, start, end)
+
+    result = run_screen(Counting(FIXTURES), "2026-08-15", ScreenConfig())
+    universe = Counting(FIXTURES).universe(100)
+    assert len(calls) < len(universe), "prices fetched for the whole universe"
+    # every priced ticker cleared durability first
+    durability_failures = {
+        r.ticker for r in result.rejections if r.stage == "durability"
+    }
+    assert not (set(calls) & durability_failures)
+
+
+def test_price_call_budget_is_enforced():
+    cfg = ScreenConfig(max_price_calls=1)
+    calls = []
+
+    class Counting(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            calls.append(ticker)
+            return super().eod_prices(ticker, start, end)
+
+    result = run_screen(Counting(FIXTURES), "2026-08-15", cfg)
+    assert len(calls) == 1
+    assert any(r.stage == "budget" for r in result.rejections)
+
+
+def test_budget_rejections_name_the_limit():
+    result = run_screen(
+        FixtureProvider(FIXTURES), "2026-08-15", ScreenConfig(max_price_calls=1)
+    )
+    budget = [r for r in result.rejections if r.stage == "budget"]
+    assert budget and "budget of 1" in budget[0].reason

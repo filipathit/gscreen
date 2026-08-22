@@ -19,9 +19,9 @@ on:
         options: [free, free-wide, free-stooq, free-yahoo, offline, paid, hybrid]
         default: free
       limit:
-        description: "Max tickers to fetch (keep small on free sources)"
+        description: "Universe size to consider (fundamentals are unmetered)"
         type: string
-        default: "10"
+        default: "50"
       use_llm:
         description: "Run the model stage and enforce grounding"
         type: boolean

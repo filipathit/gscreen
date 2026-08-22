@@ -45,6 +45,9 @@ class ScreenConfig:
     # rather than passed. Off by default because EDGAR has no EBITDA at all,
     # but worth turning on when the fundamentals source is complete.
     require_all_checks: bool = False
+    # Hard ceiling on metered price lookups per run. A free Tiingo key is
+    # roughly 500 symbols a month; one careless run can spend half of it.
+    max_price_calls: int | None = 60
     max_short_pct_float: float = 0.15
     min_days_since_earnings: int = 10
     candidates: int = 60
@@ -102,6 +105,11 @@ def _get(obj: dict, *path: str) -> Any:
 
 
 def extract_facts(f: Fundamentals, prices: list[dict], as_of: str) -> dict:
+    """Convenience wrapper: fundamentals + prices in one call."""
+    return attach_price_facts(extract_fundamental_facts(f, as_of), prices)
+
+
+def extract_fundamental_facts(f: Fundamentals, as_of: str) -> dict:
     """Flatten a normalised Fundamentals record into the exact fact set the
     screen and the model are allowed to see. Nothing is derived later from
     thin air, and nothing is read from a vendor-specific shape."""
@@ -133,11 +141,17 @@ def extract_facts(f: Fundamentals, prices: list[dict], as_of: str) -> dict:
         "net_debt_to_ebitda": net_debt_to_ebitda(f.total_debt, f.cash, f.ebitda),
         "price_to_sales_ttm": f.price_to_sales,
         "ev_to_sales": f.ev_to_sales,
-        "momentum_12_1": momentum_12_1(prices),
-        "realised_vol_60d": realised_volatility(prices),
+        "momentum_12_1": None,      # filled in later, only if worth the call
+        "realised_vol_60d": None,
         "short_pct_float": f.short_pct_float,
         "days_since_earnings": days_since_earnings(as_of, f.last_earnings_date),
     }
+
+
+def attach_price_facts(facts: dict, prices: list[dict]) -> dict:
+    facts["momentum_12_1"] = momentum_12_1(prices)
+    facts["realised_vol_60d"] = realised_volatility(prices)
+    return facts
 
 
 def _quarterly_yoy(
@@ -179,54 +193,35 @@ def _quarterly_yoy(
 
 
 def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenResult:
+    """Cheap-and-unmetered filters first, metered ones last.
+
+    EDGAR is free and unlimited; a price API key is not. Fetching prices for
+    the whole universe spends the scarce resource on companies that fail on
+    fundamentals anyway, so durability runs first and only its survivors cost
+    a price call.
+    """
+    import sys
+
     cfg = cfg or ScreenConfig()
     result = ScreenResult(as_of=as_of)
-
-    # ---- Pass 1: universe -------------------------------------------------
     universe = provider.universe(cfg.candidates)
-
     facts_by_ticker: dict[str, dict] = {}
-    for ticker in universe:
+
+    # ---- Pass 1: fundamentals (unmetered) --------------------------------
+    for index, ticker in enumerate(universe, 1):
+        print(f"  [{index}/{len(universe)}] {ticker}", file=sys.stderr, flush=True)
         try:
-            prices = provider.eod_prices(ticker, "2000-01-01", as_of)
-            facts = extract_facts(provider.fundamentals(ticker, as_of), prices, as_of)
+            facts = extract_fundamental_facts(provider.fundamentals(ticker, as_of), as_of)
         except Exception as exc:  # noqa: BLE001
-            # Unofficial sources throttle and official ones have gaps. One bad
-            # ticker must not take the run down - record it and carry on.
             result.rejections.append(
-                Rejection(ticker, "data", f"fetch failed: {exc}"[:200])
+                Rejection(ticker, "data", f"fundamentals fetch failed: {exc}"[:200])
             )
             continue
         facts_by_ticker[ticker] = facts
 
-        mom = facts["momentum_12_1"]
-        if mom is None:
-            span = (
-                f"{len(prices)} rows"
-                + (f", {prices[0]['date']}..{prices[-1]['date']}" if prices else "")
-            )
-            result.rejections.append(
-                Rejection(
-                    ticker,
-                    "momentum",
-                    f"need 274 daily closes for 12-1, got {span}",
-                )
-            )
-        elif mom < cfg.min_momentum_12_1:
-            result.rejections.append(
-                Rejection(ticker, "momentum", f"12-1 momentum {_pct(mom)} below floor")
-            )
-
-    passed_1 = [
-        t
-        for t, f in facts_by_ticker.items()
-        if f["momentum_12_1"] is not None and f["momentum_12_1"] >= cfg.min_momentum_12_1
-    ]
-
     # ---- Pass 2: growth durability ---------------------------------------
     passed_2 = []
-    for ticker in passed_1:
-        f = facts_by_ticker[ticker]
+    for ticker, f in facts_by_ticker.items():
         reasons = []
         if f["revenue_cagr_3y"] is None:
             reasons.append("no 3y revenue history")
@@ -274,8 +269,54 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
         else:
             passed_2.append(ticker)
 
-    # ---- Pass 3: exclusions ----------------------------------------------
+    # ---- Pass 3: momentum (metered - survivors only) ----------------------
+    if cfg.max_price_calls is not None and len(passed_2) > cfg.max_price_calls:
+        for ticker in passed_2[cfg.max_price_calls :]:
+            result.rejections.append(
+                Rejection(
+                    ticker,
+                    "budget",
+                    f"price-call budget of {cfg.max_price_calls} reached",
+                )
+            )
+        passed_2 = passed_2[: cfg.max_price_calls]
+
+    print(
+        f"  fundamentals passed: {len(passed_2)} - fetching prices for those only",
+        file=sys.stderr,
+        flush=True,
+    )
+
+    passed_3 = []
     for ticker in passed_2:
+        f = facts_by_ticker[ticker]
+        try:
+            prices = provider.eod_prices(ticker, "2000-01-01", as_of)
+        except Exception as exc:  # noqa: BLE001
+            result.rejections.append(
+                Rejection(ticker, "data", f"price fetch failed: {exc}"[:200])
+            )
+            continue
+        attach_price_facts(f, prices)
+
+        mom = f["momentum_12_1"]
+        if mom is None:
+            span = (
+                f"{len(prices)} rows"
+                + (f", {prices[0]['date']}..{prices[-1]['date']}" if prices else "")
+            )
+            result.rejections.append(
+                Rejection(ticker, "momentum", f"need 274 daily closes for 12-1, got {span}")
+            )
+        elif mom < cfg.min_momentum_12_1:
+            result.rejections.append(
+                Rejection(ticker, "momentum", f"12-1 momentum {_pct(mom)} below floor")
+            )
+        else:
+            passed_3.append(ticker)
+
+    # ---- Pass 4: exclusions ----------------------------------------------
+    for ticker in passed_3:
         f = facts_by_ticker[ticker]
         if squeeze_risk(f["short_pct_float"], cfg.max_short_pct_float):
             result.rejections.append(
