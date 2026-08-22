@@ -520,3 +520,42 @@ def test_size_floor_rejects_microcaps():
         Micro(FIXTURES), "2026-08-15", ScreenConfig(min_market_cap=2_000_000_000)
     )
     assert any(r.stage == "size" for r in result.rejections)
+
+
+def test_throttling_trips_a_circuit_breaker():
+    """An hourly quota will not reset mid-run. After a few refusals the screen
+    should stop asking rather than grind through the rest."""
+    from gscreen.providers import FetchError
+
+    attempts = []
+
+    class Throttled(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            attempts.append(ticker)
+            raise FetchError("https://api.example/prices", 429, "throttled")
+
+    result = run_screen(
+        Throttled(FIXTURES), "2026-08-15", ScreenConfig(throttle_circuit_breaker=2)
+    )
+    assert len(attempts) == 2, "should stop after the breaker trips"
+    assert any(r.stage == "throttled" for r in result.rejections)
+    tripped = next(r for r in result.rejections if r.stage == "throttled")
+    assert "rate limiting" in tripped.reason
+
+
+def test_a_success_resets_the_breaker():
+    from gscreen.providers import FetchError
+
+    calls = {"n": 0}
+
+    class Flaky(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            calls["n"] += 1
+            if calls["n"] % 2 == 1:
+                raise FetchError("https://api.example/prices", 429, "throttled")
+            return super().eod_prices(ticker, start, end)
+
+    result = run_screen(
+        Flaky(FIXTURES), "2026-08-15", ScreenConfig(throttle_circuit_breaker=2)
+    )
+    assert not any(r.stage == "throttled" for r in result.rejections)

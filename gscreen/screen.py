@@ -50,6 +50,10 @@ class ScreenConfig:
     # Tiingo's free tier allows roughly 50 symbols an hour; the first wide run
     # hit HTTP 429 at about 52 calls. Stay under it.
     max_price_calls: int | None = 45
+    # Consecutive throttle refusals before abandoning the price stage. An
+    # hourly quota does not reset mid-run, so grinding through the rest just
+    # burns wall-clock and tells you nothing new.
+    throttle_circuit_breaker: int = 3
     max_short_pct_float: float = 0.15
     min_days_since_earnings: int = 10
     candidates: int = 60
@@ -321,11 +325,28 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
     )
 
     passed_3 = []
-    for ticker in passed_2:
+    consecutive_throttles = 0
+    for position, ticker in enumerate(passed_2):
         f = facts_by_ticker[ticker]
+
+        if consecutive_throttles >= cfg.throttle_circuit_breaker:
+            for remaining in passed_2[position:]:
+                result.rejections.append(
+                    Rejection(
+                        remaining,
+                        "throttled",
+                        "price source is rate limiting; stopped asking "
+                        f"after {consecutive_throttles} refusals in a row",
+                    )
+                )
+            break
+
         try:
             prices = provider.eod_prices(ticker, "2000-01-01", as_of)
+            consecutive_throttles = 0
         except Exception as exc:  # noqa: BLE001
+            if "429" in str(exc) or "throttled" in str(exc):
+                consecutive_throttles += 1
             result.rejections.append(
                 Rejection(ticker, "data", f"price fetch failed: {exc}"[:200])
             )

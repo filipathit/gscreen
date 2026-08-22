@@ -126,6 +126,7 @@ class _Http:
         headers: dict | None = None,
         scope: str | None = None,
         keep_days: int = 3,
+        throttle_retries: int = 1,
     ) -> None:
         self.scope = scope or date.today().isoformat()
         self.cache_dir = Path(cache_dir) / self.scope if cache_dir else None
@@ -134,6 +135,10 @@ class _Http:
             prune_cache(Path(cache_dir), keep_days)
         self.min_interval = min_interval
         self.max_retries = max_retries
+        # A 429 from an hourly quota will not clear during this run. Retrying
+        # it four times with exponential backoff turns each refusal into ~19
+        # seconds of dead wall-clock and changes nothing.
+        self.throttle_retries = throttle_retries
         self._last = 0.0
         self._session = requests.Session()
         if headers:
@@ -161,7 +166,9 @@ class _Http:
                 status = resp.status_code
                 if status in (429, 503):
                     detail = "throttled"
-                    time.sleep(2**attempt + 1)
+                    if attempt >= self.throttle_retries:
+                        break
+                    time.sleep(1 + attempt)
                     continue
                 if status >= 400:
                     detail = (resp.text or "")[:160].replace("\n", " ").strip()
@@ -200,7 +207,9 @@ class _Http:
                 status = resp.status_code
                 if status in (429, 503):
                     detail = "throttled"
-                    time.sleep(2**attempt + 1)
+                    if attempt >= self.throttle_retries:
+                        break
+                    time.sleep(1 + attempt)
                     continue
                 if status >= 400:
                     detail = (resp.text or "")[:160].replace("\n", " ").strip()
