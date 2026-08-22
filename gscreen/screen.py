@@ -172,8 +172,16 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
 
         mom = facts["momentum_12_1"]
         if mom is None:
+            span = (
+                f"{len(prices)} rows"
+                + (f", {prices[0]['date']}..{prices[-1]['date']}" if prices else "")
+            )
             result.rejections.append(
-                Rejection(ticker, "momentum", "insufficient price history for 12-1")
+                Rejection(
+                    ticker,
+                    "momentum",
+                    f"need 274 daily closes for 12-1, got {span}",
+                )
             )
         elif mom < cfg.min_momentum_12_1:
             result.rejections.append(

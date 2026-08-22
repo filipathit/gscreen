@@ -68,14 +68,15 @@ def doctor(args) -> None:
         "universe (static)",
         lambda: f"{len(StaticUniverse(UNIVERSE_FILE).universe(1000))} tickers",
     )
-    check(
-        "prices (stooq)",
-        lambda: f"{len(StooqPrices().eod_prices(ticker, '2024-01-01', as_of))} rows",
-    )
-    check(
-        "prices (yahoo)",
-        lambda: f"{len(YahooPrices().eod_prices(ticker, '2024-01-01', as_of))} rows",
-    )
+    def describe_series(source):
+        rows = source.eod_prices(ticker, "2000-01-01", as_of)
+        if not rows:
+            return "0 rows"
+        enough = "enough" if len(rows) >= 274 else "TOO FEW for 12-1"
+        return f"{len(rows)} rows, {rows[0]['date']}..{rows[-1]['date']} ({enough})"
+
+    check("prices (stooq)", lambda: describe_series(StooqPrices()))
+    check("prices (yahoo)", lambda: describe_series(YahooPrices()))
 
     edgar = EdgarFundamentals()
     check("edgar ticker index", lambda: f"CIK {edgar.cik_for(ticker)}")
@@ -89,6 +90,8 @@ def doctor(args) -> None:
     print(
         "\nA 403 from EDGAR usually means SEC_USER_AGENT is unset or generic."
         "\nA 429 from Yahoo is throttling - use --prices stooq instead."
+        "\n12-1 momentum needs 274 daily closes (~13 months); a short series"
+        "\nmeans the price source truncated the range, not that the screen failed."
     )
 
 

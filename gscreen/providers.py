@@ -320,17 +320,34 @@ class StooqPrices:
         )
 
     def eod_prices(self, ticker: str, start: str, end: str) -> list[dict]:
+        # d1/d2 make the requested window explicit. Without them the endpoint
+        # is free to decide how much history to hand back.
         text = self.http.get_text(
-            STOOQ_CSV, {"s": f"{ticker.lower()}.us", "i": "d"}
+            STOOQ_CSV,
+            {
+                "s": f"{ticker.lower()}.us",
+                "i": "d",
+                "d1": start.replace("-", ""),
+                "d2": end.replace("-", ""),
+            },
         )
-        return parse_stooq_csv(text, start, end)
+        return parse_stooq_csv(text, start, end, source=f"stooq:{ticker}")
 
 
-def parse_stooq_csv(text: str, start: str, end: str) -> list[dict]:
-    """Date,Open,High,Low,Close,Volume - oldest first."""
+def parse_stooq_csv(
+    text: str, start: str, end: str, source: str = "stooq"
+) -> list[dict]:
+    """Date,Open,High,Low,Close,Volume - oldest first.
+
+    A non-CSV body means Stooq refused (daily hit limit, unknown symbol). That
+    is a fetch failure, not an empty series, and must not be silently
+    swallowed into "no data".
+    """
     lines = [line for line in text.splitlines() if line.strip()]
-    if not lines or not lines[0].lower().startswith("date"):
+    if not lines:
         return []
+    if not lines[0].lower().startswith("date"):
+        raise FetchError(source, None, f"unexpected body: {text[:120].strip()}")
     header = [h.strip().lower() for h in lines[0].split(",")]
     try:
         date_i, close_i = header.index("date"), header.index("close")

@@ -210,7 +210,11 @@ def test_stooq_csv_parses_and_filters_by_date():
 def test_stooq_handles_error_bodies_and_gaps():
     from gscreen.providers import parse_stooq_csv
 
-    assert parse_stooq_csv("Exceeded the daily hits limit", "2020-01-01", "2030-01-01") == []
+    from gscreen.providers import FetchError
+
+    # A refusal must surface as a fetch failure, not as "no data".
+    with pytest.raises(FetchError):
+        parse_stooq_csv("Exceeded the daily hits limit", "2020-01-01", "2030-01-01")
     assert parse_stooq_csv("", "2020-01-01", "2030-01-01") == []
     gappy = "Date,Close\n2025-01-02,\n2025-01-03,N/A\n2025-01-06,12.0\n"
     assert len(parse_stooq_csv(gappy, "2020-01-01", "2030-01-01")) == 1
@@ -237,3 +241,16 @@ def test_data_rejection_carries_the_real_reason():
     result = run_screen(Broken(FIXTURES), "2026-08-15", ScreenConfig())
     reasons = [r.reason for r in result.rejections if r.stage == "data"]
     assert reasons and all("429" in r and "throttled" in r for r in reasons)
+
+
+def test_short_history_rejection_states_what_it_got():
+    """'insufficient price history' with no numbers is not a diagnosis."""
+
+    class Short(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            return super().eod_prices(ticker, start, end)[:30]
+
+    result = run_screen(Short(FIXTURES), "2026-08-15", ScreenConfig())
+    reasons = [r.reason for r in result.rejections if r.stage == "momentum"]
+    assert reasons
+    assert all("30 rows" in r and "274" in r for r in reasons)
