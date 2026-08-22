@@ -1,11 +1,14 @@
-Screen as of 2026-08-22: 3 survivors
-  ALPHA  cagr3y=  41.8% mom12-1=  52.0% qtrs=8 r40=  63.8% dilution=   2.0%
-  GOLF   cagr3y=  36.7% mom12-1=  47.0% qtrs=8 r40=  52.7% dilution=   3.0%
-  BRAVO  cagr3y=  34.6% mom12-1=  34.0% qtrs=8 r40=  52.6% dilution=   3.0%
-Rejected: 6
-  INDIA  [momentum] 12-1 momentum    2.0% below floor
-  CHARL  [durability] net debt/EBITDA 149.1x above cap
-  HOTEL  [durability] 3y revenue CAGR    6.3% below floor; only 0 consecutive growth quarters
-  DELTA  [durability] 3y revenue CAGR   18.0% below floor; only 1 consecutive growth quarters
-  ECHO   [durability] dilution   19.0% above cap
-  FOXTR  [exclusion] short interest   24.0% of float
+sources: universe=StaticUniverse  prices=YahooPrices  fundamentals=EdgarFundamentals  point_in_time=True
+
+Screen as of 2026-08-22: 0 survivors
+Rejected: 10
+  ADBE   [data] fetch failed: RuntimeError
+  AMD    [data] fetch failed: RuntimeError
+  ANET   [data] fetch failed: RuntimeError
+  APP    [data] fetch failed: RuntimeError
+  AVGO   [data] fetch failed: RuntimeError
+  AXON   [data] fetch failed: RuntimeError
+  CAVA   [data] fetch failed: RuntimeError
+  CRM    [data] fetch failed: RuntimeError
+  CRWD   [data] fetch failed: RuntimeError
+  CRWV   [data] fetch failed: RuntimeError
