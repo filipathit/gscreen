@@ -1,14 +1,14 @@
-sources: universe=StaticUniverse  prices=YahooPrices  fundamentals=EdgarFundamentals  point_in_time=True
+sources: universe=StaticUniverse  prices=StooqPrices  fundamentals=EdgarFundamentals  point_in_time=True
 
 Screen as of 2026-08-22: 0 survivors
 Rejected: 10
-  ADBE   [data] fetch failed: RuntimeError
-  AMD    [data] fetch failed: RuntimeError
-  ANET   [data] fetch failed: RuntimeError
-  APP    [data] fetch failed: RuntimeError
-  AVGO   [data] fetch failed: RuntimeError
-  AXON   [data] fetch failed: RuntimeError
-  CAVA   [data] fetch failed: RuntimeError
-  CRM    [data] fetch failed: RuntimeError
-  CRWD   [data] fetch failed: RuntimeError
-  CRWV   [data] fetch failed: RuntimeError
+  ADBE   [momentum] insufficient price history for 12-1
+  AMD    [momentum] insufficient price history for 12-1
+  ANET   [momentum] insufficient price history for 12-1
+  APP    [momentum] insufficient price history for 12-1
+  AVGO   [momentum] insufficient price history for 12-1
+  AXON   [momentum] insufficient price history for 12-1
+  CAVA   [momentum] insufficient price history for 12-1
+  CRM    [momentum] insufficient price history for 12-1
+  CRWD   [momentum] insufficient price history for 12-1
+  CRWV   [momentum] insufficient price history for 12-1
