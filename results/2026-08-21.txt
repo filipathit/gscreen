@@ -1,17 +1,61 @@
 sources: universe=StaticUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True  universe_pit=False
 
-Screen as of 2026-08-21: 3 survivors
+Screen as of 2026-08-21: 9 survivors
+  RDDT   cagr3y=  48.9% mom12-1=  15.8% qtrs=7 r40=  80.0% dilution=n/a
+         untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
+  SNOW   cagr3y=  31.4% mom12-1=  24.9% qtrs=16 r40=  55.3% dilution=   0.8%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  NET    cagr3y=  30.5% mom12-1=  37.7% qtrs=20 r40=  43.8% dilution=n/a
+         untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
   CRWD   cagr3y=  29.0% mom12-1=  55.7% qtrs=21 r40=  56.2% dilution=n/a
          untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
   ANET   cagr3y=  27.1% mom12-1=  60.9% qtrs=18 r40=  75.7% dilution=   0.2%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  DDOG   cagr3y=  26.9% mom12-1=  68.7% qtrs=20 r40=  56.1% dilution=n/a
+         untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
   AVGO   cagr3y=  24.4% mom12-1=  41.9% qtrs=8 r40=  66.5% dilution=   0.5%
          untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
-Rejected: 7
+  MDB    cagr3y=  24.3% mom12-1=  33.4% qtrs=21 r40=  44.6% dilution=   0.0%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  VRT    cagr3y=  21.6% mom12-1= 142.9% qtrs=7 r40=  40.1% dilution=   0.3%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+Rejected: 39
   ADBE   [momentum] 12-1 momentum  -43.1% below floor
   APP    [momentum] 12-1 momentum   14.0% below floor
   AXON   [momentum] 12-1 momentum  -31.8% below floor
   CAVA   [momentum] 12-1 momentum  -29.7% below floor
   CRM    [momentum] 12-1 momentum  -40.0% below floor
   CRWV   [momentum] 12-1 momentum  -37.5% below floor
+  DKNG   [momentum] 12-1 momentum  -48.8% below floor
+  ELF    [momentum] 12-1 momentum  -34.4% below floor
+  HIMS   [momentum] 12-1 momentum  -34.5% below floor
+  HOOD   [momentum] 12-1 momentum   -0.3% below floor
+  INTU   [momentum] 12-1 momentum  -62.9% below floor
+  KVYO   [momentum] 12-1 momentum  -52.2% below floor
+  META   [momentum] 12-1 momentum  -13.7% below floor
+  MSFT   [momentum] 12-1 momentum  -23.9% below floor
+  MSTR   [momentum] 12-1 momentum  -78.0% below floor
+  NOW    [momentum] 12-1 momentum  -52.2% below floor
+  ONON   [momentum] 12-1 momentum  -30.8% below floor
+  ORCL   [momentum] 12-1 momentum  -49.0% below floor
+  PLTR   [momentum] 12-1 momentum  -17.2% below floor
+  RBLX   [momentum] 12-1 momentum  -60.4% below floor
+  RBRK   [momentum] 12-1 momentum  -13.3% below floor
+  S      [momentum] 12-1 momentum   -9.7% below floor
+  SHOP   [momentum] 12-1 momentum   -9.5% below floor
+  SPOT   [momentum] 12-1 momentum  -30.6% below floor
+  SQ     [momentum] need 274 daily closes for 12-1, got 0 rows
+  TEAM   [momentum] 12-1 momentum  -59.6% below floor
+  TOST   [momentum] 12-1 momentum  -40.4% below floor
+  TSLA   [momentum] 12-1 momentum   -3.7% below floor
+  TTD    [momentum] 12-1 momentum  -79.4% below floor
+  UBER   [momentum] 12-1 momentum  -24.9% below floor
+  WDAY   [momentum] 12-1 momentum  -46.5% below floor
+  ZS     [momentum] 12-1 momentum  -51.1% below floor
   AMD    [durability] 3y revenue CAGR   13.6% below floor
+  FTNT   [durability] 3y revenue CAGR   15.5% below floor
+  GOOGL  [durability] 3y revenue CAGR   10.8% below floor
+  NVDA   [durability] only 1 consecutive growth quarters
+  OSCR   [durability] 3y revenue CAGR  -23.9% below floor
+  PANW   [durability] 3y revenue CAGR   18.8% below floor; dilution   15.6% above cap
+  TSM    [durability] no 3y revenue history; only 0 consecutive growth quarters
