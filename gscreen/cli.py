@@ -40,9 +40,63 @@ def resolve_sources(args) -> tuple[str, str, str]:
     )
 
 
+def doctor(args) -> None:
+    """Probe each source once and report exactly what came back.
+
+    A screen that rejects everything with the same error tells you nothing.
+    This tells you which of the three sources is broken, and how.
+    """
+    from .providers import (
+        EdgarFundamentals,
+        StaticUniverse,
+        StooqPrices,
+        YahooPrices,
+    )
+
+    ticker = "AAPL"
+    as_of = args.as_of
+    print(f"probing sources with {ticker}, as_of={as_of}\n")
+
+    def check(label, fn):
+        try:
+            result = fn()
+            print(f"  OK    {label:<22} {result}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"  FAIL  {label:<22} {exc}")
+
+    check(
+        "universe (static)",
+        lambda: f"{len(StaticUniverse(UNIVERSE_FILE).universe(1000))} tickers",
+    )
+    check(
+        "prices (stooq)",
+        lambda: f"{len(StooqPrices().eod_prices(ticker, '2024-01-01', as_of))} rows",
+    )
+    check(
+        "prices (yahoo)",
+        lambda: f"{len(YahooPrices().eod_prices(ticker, '2024-01-01', as_of))} rows",
+    )
+
+    edgar = EdgarFundamentals()
+    check("edgar ticker index", lambda: f"CIK {edgar.cik_for(ticker)}")
+    check(
+        "edgar fundamentals",
+        lambda: (
+            f"{len(edgar.fundamentals(ticker, as_of).annual_revenue)} annual "
+            "revenue periods"
+        ),
+    )
+    print(
+        "\nA 403 from EDGAR usually means SEC_USER_AGENT is unset or generic."
+        "\nA 429 from Yahoo is throttling - use --prices stooq instead."
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="gscreen")
-    parser.add_argument("command", choices=["screen", "backtest", "prompt", "sources"])
+    parser.add_argument(
+        "command", choices=["screen", "backtest", "prompt", "sources", "doctor"]
+    )
     parser.add_argument("--preset", default="offline", choices=sorted(PRESETS))
     parser.add_argument("--universe", choices=SOURCES["universe"])
     parser.add_argument("--prices", choices=SOURCES["prices"])
@@ -64,6 +118,10 @@ def main() -> None:
         print()
         for capability, options in SOURCES.items():
             print(f"{capability:<13} {' | '.join(options)}")
+        return
+
+    if args.command == "doctor":
+        doctor(args)
         return
 
     universe, prices, fundamentals = resolve_sources(args)

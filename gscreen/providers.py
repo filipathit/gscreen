@@ -36,10 +36,22 @@ YAHOO_CHART = "https://query1.finance.yahoo.com/v8/finance/chart"
 YAHOO_QUOTE = "https://query1.finance.yahoo.com/v7/finance/quote"
 EDGAR_FACTS = "https://data.sec.gov/api/xbrl/companyfacts"
 EDGAR_TICKERS = "https://www.sec.gov/files/company_tickers.json"
+STOOQ_CSV = "https://stooq.com/q/d/l/"
 
 DEFAULT_UA = os.environ.get(
     "SEC_USER_AGENT", "gscreen research script (set SEC_USER_AGENT to your email)"
 )
+
+
+class FetchError(RuntimeError):
+    """Carries what actually went wrong. A bare RuntimeError told us nothing."""
+
+    def __init__(self, url: str, status: int | None, detail: str) -> None:
+        self.url = url
+        self.status = status
+        self.detail = detail
+        shown = f"HTTP {status}" if status else "no response"
+        super().__init__(f"{shown} - {detail} ({url.split('?')[0]})")
 
 
 def serialise_filters(filters: list[list[Any]]) -> str:
@@ -98,7 +110,8 @@ class _Http:
             if cache.exists():
                 return json.loads(cache.read_text())
 
-        last: Exception | None = None
+        status: int | None = None
+        detail = "unknown"
         for attempt in range(self.max_retries):
             wait = self.min_interval - (time.monotonic() - self._last)
             if wait > 0:
@@ -106,20 +119,64 @@ class _Http:
             self._last = time.monotonic()
             try:
                 resp = self._session.get(url, params=params, timeout=30)
-                if resp.status_code in (429, 503):
+                status = resp.status_code
+                if status in (429, 503):
+                    detail = "throttled"
                     time.sleep(2**attempt + 1)
                     continue
-                resp.raise_for_status()
+                if status >= 400:
+                    detail = (resp.text or "")[:160].replace("\n", " ").strip()
+                    if status in (401, 403):
+                        break  # retrying a refusal only wastes time
+                    time.sleep(2**attempt)
+                    continue
                 payload = resp.json()
                 if cache:
                     cache.write_text(json.dumps(payload))
                 return payload
             except requests.RequestException as exc:
-                last = exc
+                detail = f"{type(exc).__name__}: {exc}"[:160]
                 time.sleep(2**attempt)
-        raise RuntimeError(
-            f"request failed after {self.max_retries} tries: {url}"
-        ) from last
+        raise FetchError(url, status, detail)
+
+
+    def get_text(self, url: str, params: dict | None = None) -> str:
+        params = params or {}
+        cache = None
+        if self.cache_dir:
+            key = hashlib.sha256(f"{url}{sorted(params.items())}".encode()).hexdigest()[:20]
+            cache = self.cache_dir / f"{key}.txt"
+            if cache.exists():
+                return cache.read_text()
+
+        status: int | None = None
+        detail = "unknown"
+        for attempt in range(self.max_retries):
+            wait = self.min_interval - (time.monotonic() - self._last)
+            if wait > 0:
+                time.sleep(wait)
+            self._last = time.monotonic()
+            try:
+                resp = self._session.get(url, params=params, timeout=30)
+                status = resp.status_code
+                if status in (429, 503):
+                    detail = "throttled"
+                    time.sleep(2**attempt + 1)
+                    continue
+                if status >= 400:
+                    detail = (resp.text or "")[:160].replace("\n", " ").strip()
+                    if status in (401, 403):
+                        break
+                    time.sleep(2**attempt)
+                    continue
+                text = resp.text
+                if cache:
+                    cache.write_text(text)
+                return text
+            except requests.RequestException as exc:
+                detail = f"{type(exc).__name__}: {exc}"[:160]
+                time.sleep(2**attempt)
+        raise FetchError(url, status, detail)
 
 
 # --------------------------------------------------------------------------
@@ -242,6 +299,59 @@ def parse_yahoo_chart(payload: dict) -> list[dict]:
             continue
         day = datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
         out.append({"date": day, "adjusted_close": float(close)})
+    return out
+
+
+class StooqPrices:
+    """Free daily OHLCV as CSV. No key, no auth, and — unlike Yahoo — it does
+    not appear to single out datacenter IPs, which makes it the sane default
+    for a CI runner.
+
+    Caveat worth knowing: Stooq closes are split-adjusted but not
+    dividend-adjusted, so total-return momentum is understated for payers.
+    For a growth screen that is mostly harmless; for income names it is not.
+    """
+
+    def __init__(self, cache_dir="_cache/stooq") -> None:
+        self.http = _Http(
+            cache_dir=cache_dir,
+            min_interval=0.5,
+            headers={"User-Agent": "gscreen research script"},
+        )
+
+    def eod_prices(self, ticker: str, start: str, end: str) -> list[dict]:
+        text = self.http.get_text(
+            STOOQ_CSV, {"s": f"{ticker.lower()}.us", "i": "d"}
+        )
+        return parse_stooq_csv(text, start, end)
+
+
+def parse_stooq_csv(text: str, start: str, end: str) -> list[dict]:
+    """Date,Open,High,Low,Close,Volume - oldest first."""
+    lines = [line for line in text.splitlines() if line.strip()]
+    if not lines or not lines[0].lower().startswith("date"):
+        return []
+    header = [h.strip().lower() for h in lines[0].split(",")]
+    try:
+        date_i, close_i = header.index("date"), header.index("close")
+    except ValueError:
+        return []
+
+    out = []
+    for line in lines[1:]:
+        parts = line.split(",")
+        if len(parts) <= max(date_i, close_i):
+            continue
+        day, close = parts[date_i].strip(), parts[close_i].strip()
+        if not day or close in ("", "N/A"):
+            continue
+        if not (start <= day <= end):
+            continue
+        try:
+            out.append({"date": day, "adjusted_close": float(close)})
+        except ValueError:
+            continue
+    out.sort(key=lambda r: r["date"])
     return out
 
 
@@ -381,14 +491,17 @@ class CompositeProvider:
 
 SOURCES = {
     "universe": ("eodhd", "static", "fixture"),
-    "prices": ("eodhd", "yahoo", "fixture"),
+    "prices": ("eodhd", "yahoo", "stooq", "fixture"),
     "fundamentals": ("eodhd", "edgar", "fixture"),
 }
 
 PRESETS = {
     # name: (universe, prices, fundamentals)
     "offline": ("fixture", "fixture", "fixture"),
-    "free": ("static", "yahoo", "edgar"),
+    # Stooq rather than Yahoo by default: Yahoo throttles shared cloud IPs,
+    # which is exactly what a CI runner is. Use --prices yahoo to override.
+    "free": ("static", "stooq", "edgar"),
+    "free-yahoo": ("static", "yahoo", "edgar"),
     "paid": ("eodhd", "eodhd", "eodhd"),
     "hybrid": ("eodhd", "eodhd", "edgar"),  # paid discovery, honest fundamentals
 }
@@ -421,6 +534,7 @@ def build_provider(
     price_source = {
         "eodhd": get_eodhd,
         "yahoo": YahooPrices,
+        "stooq": StooqPrices,
         "fixture": get_fixture,
     }[prices]()
 

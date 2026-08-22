@@ -151,8 +151,10 @@ def test_every_preset_names_valid_sources():
         assert fundamentals in SOURCES["fundamentals"], name
 
 
-def test_free_and_paid_presets_need_no_network_to_construct_names():
-    assert PRESETS["free"] == ("static", "yahoo", "edgar")
+def test_free_preset_defaults_to_stooq_not_yahoo():
+    """Yahoo throttles shared cloud IPs, which is what CI runs on."""
+    assert PRESETS["free"] == ("static", "stooq", "edgar")
+    assert PRESETS["free-yahoo"] == ("static", "yahoo", "edgar")
     assert PRESETS["paid"] == ("eodhd", "eodhd", "eodhd")
 
 
@@ -184,3 +186,54 @@ def test_a_failing_ticker_is_logged_not_fatal():
     failed = [r for r in result.rejections if r.stage == "data"]
     assert [r.ticker for r in failed] == ["ALPHA"]
     assert "BRAVO" in [row["ticker"] for row in result.survivors]
+
+
+# --------------------------------------------------------------------------
+# Stooq + error reporting
+# --------------------------------------------------------------------------
+
+
+def test_stooq_csv_parses_and_filters_by_date():
+    from gscreen.providers import parse_stooq_csv
+
+    csv = (
+        "Date,Open,High,Low,Close,Volume\n"
+        "2024-12-31,9,10,8,9.5,100\n"
+        "2025-01-02,10,11,9,10.5,1000\n"
+        "2025-01-03,10.5,12,10,11.25,900\n"
+    )
+    rows = parse_stooq_csv(csv, "2025-01-01", "2025-12-31")
+    assert [r["date"] for r in rows] == ["2025-01-02", "2025-01-03"]
+    assert rows[1]["adjusted_close"] == 11.25
+
+
+def test_stooq_handles_error_bodies_and_gaps():
+    from gscreen.providers import parse_stooq_csv
+
+    assert parse_stooq_csv("Exceeded the daily hits limit", "2020-01-01", "2030-01-01") == []
+    assert parse_stooq_csv("", "2020-01-01", "2030-01-01") == []
+    gappy = "Date,Close\n2025-01-02,\n2025-01-03,N/A\n2025-01-06,12.0\n"
+    assert len(parse_stooq_csv(gappy, "2020-01-01", "2030-01-01")) == 1
+
+
+def test_fetch_error_reports_status_and_host():
+    from gscreen.providers import FetchError
+
+    err = FetchError("https://example.com/api?token=secret", 429, "throttled")
+    text = str(err)
+    assert "429" in text and "throttled" in text
+    assert "token=secret" not in text, "query string must not leak into the message"
+
+
+def test_data_rejection_carries_the_real_reason():
+    """The first free run rejected ten tickers with a bare RuntimeError, which
+    was useless. The reason must now name the failure."""
+    from gscreen.providers import FetchError
+
+    class Broken(FixtureProvider):
+        def eod_prices(self, ticker, start, end):
+            raise FetchError("https://prices.example/x", 429, "throttled")
+
+    result = run_screen(Broken(FIXTURES), "2026-08-15", ScreenConfig())
+    reasons = [r.reason for r in result.rejections if r.stage == "data"]
+    assert reasons and all("429" in r and "throttled" in r for r in reasons)

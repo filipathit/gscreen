@@ -31,18 +31,19 @@ that standard. This does, and enforces it in code.
 
 Three capabilities, each swappable independently:
 
-| | eodhd | yahoo | edgar | static | fixture |
-|---|---|---|---|---|---|
-| universe | screener | – | – | `universe.txt` | offline |
-| prices | paid | free, decades of history | – | – | offline |
-| fundamentals | paid snapshot | – | **free, point-in-time** | – | offline |
+| | eodhd | stooq | yahoo | edgar | static | fixture |
+|---|---|---|---|---|---|---|
+| universe | screener | – | – | – | `universe.txt` | offline |
+| prices | paid | free, CI-friendly | free, deep history | – | – | offline |
+| fundamentals | paid snapshot | – | – | **free, point-in-time** | – | offline |
 
 Presets are shorthand; any flag overrides the preset:
 
 ```bash
 python -m gscreen.cli sources                     # list everything
 python -m gscreen.cli screen --preset offline     # fixtures, no network
-python -m gscreen.cli screen --preset free        # static + Yahoo + EDGAR, $0
+python -m gscreen.cli screen --preset free        # static + Stooq + EDGAR, $0
+python -m gscreen.cli doctor                      # probe each source, report status
 python -m gscreen.cli screen --preset paid        # EODHD throughout
 python -m gscreen.cli screen --preset hybrid      # EODHD discovery, EDGAR facts
 python -m gscreen.cli screen --preset free --prices eodhd   # mix freely
@@ -54,10 +55,14 @@ candidates, EDGAR supplies fundamentals that are actually point-in-time.
 
 Trade-offs worth knowing before you pick:
 
-- **Yahoo** has had no official API since 2017. These are the endpoints the
-  website calls; they throttle hard, and shared cloud IPs (CI runners) get
-  throttled first. A failed fetch is logged as a `[data]` rejection and the
-  run continues rather than dying.
+- **Stooq** is the default free price source: no key, plain CSV, and it does
+  not single out datacenter IPs. Its closes are split-adjusted but not
+  dividend-adjusted, so momentum is understated for dividend payers.
+- **Yahoo** has had no official API since 2017 and throttles shared cloud IPs
+  first — the initial CI run rejected every ticker. Available via
+  `--prices yahoo` or `--preset free-yahoo`; better from a laptop than from a
+  runner. A failed fetch is logged as a `[data]` rejection naming the status
+  code, and the run continues.
 - **EDGAR** is official, free, and stamps every fact with its filing date —
   but covers US filers only, has no market cap, no EBITDA, and no GICS
   sector. Those fields stay null and the model is told they're missing rather

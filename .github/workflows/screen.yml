@@ -66,6 +66,20 @@ jobs:
           fi
           echo "preset=$PRESET" >> "$GITHUB_OUTPUT"
 
+      # Probe each source before the real run, so a failure names the source
+      # and status instead of producing a wall of identical rejections.
+      - name: Check sources
+        continue-on-error: true
+        env:
+          SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT || 'gscreen research script' }}
+        run: |
+          {
+            echo '## Source check'
+            echo '```'
+            PYTHONPATH=. python -m gscreen.cli doctor --as-of "$(date -u +%F)" 2>&1
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Run screen
         env:
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}

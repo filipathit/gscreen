@@ -165,7 +165,7 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
             # Unofficial sources throttle and official ones have gaps. One bad
             # ticker must not take the run down - record it and carry on.
             result.rejections.append(
-                Rejection(ticker, "data", f"fetch failed: {type(exc).__name__}")
+                Rejection(ticker, "data", f"fetch failed: {exc}"[:200])
             )
             continue
         facts_by_ticker[ticker] = facts
