@@ -1,0 +1,14 @@
+sources: universe=StaticUniverse  prices=StooqPrices  fundamentals=EdgarFundamentals  point_in_time=True
+
+Screen as of 2026-08-21: 0 survivors
+Rejected: 10
+  ADBE   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:ADBE)
+  AMD    [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:AMD)
+  ANET   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:ANET)
+  APP    [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:APP)
+  AVGO   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:AVGO)
+  AXON   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:AXON)
+  CAVA   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:CAVA)
+  CRM    [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:CRM)
+  CRWD   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:CRWD)
+  CRWV   [data] fetch failed: no response - unexpected body: <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"></head><body><noscript>T (stooq:CRWV)
