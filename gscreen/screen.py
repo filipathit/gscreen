@@ -41,6 +41,10 @@ class ScreenConfig:
     min_rule_of_40: float | None = None      # informational unless set
     max_net_debt_ebitda: float | None = 4.0
     max_dilution: float = 0.10
+    # When True, a company whose data cannot support every gate is rejected
+    # rather than passed. Off by default because EDGAR has no EBITDA at all,
+    # but worth turning on when the fundamentals source is complete.
+    require_all_checks: bool = False
     max_short_pct_float: float = 0.15
     min_days_since_earnings: int = 10
     candidates: int = 60
@@ -74,6 +78,10 @@ class ScreenResult:
                 f" r40={_pct(row['rule_of_40'])}"
                 f" dilution={_pct(row['share_count_growth'])}"
             )
+            if row.get("checks_skipped"):
+                lines.append(
+                    f"         untested: {', '.join(row['checks_skipped'])}"
+                )
         lines.append(f"Rejected: {len(self.rejections)}")
         for rej in self.rejections:
             lines.append(f"  {rej.ticker:<6} [{rej.stage}] {rej.reason}")
@@ -224,8 +232,24 @@ def run_screen(provider, as_of: str, cfg: ScreenConfig | None = None) -> ScreenR
         ):
             reasons.append(f"net debt/EBITDA {f['net_debt_to_ebitda']:.1f}x above cap")
 
+        # A check that cannot run is not a check that passed. Record it.
+        skipped = []
+        if f["net_debt_to_ebitda"] is None and cfg.max_net_debt_ebitda is not None:
+            skipped.append("leverage (no EBITDA)")
+        if f["share_count_growth"] is None:
+            skipped.append("dilution (no share history)")
+        if f["short_pct_float"] is None:
+            skipped.append("squeeze (no short interest)")
+        if f["market_cap"] is None:
+            skipped.append("size (no market cap)")
+        f["checks_skipped"] = skipped
+
         if reasons:
             result.rejections.append(Rejection(ticker, "durability", "; ".join(reasons)))
+        elif cfg.require_all_checks and skipped:
+            result.rejections.append(
+                Rejection(ticker, "incomplete", "untested: " + ", ".join(skipped))
+            )
         else:
             passed_2.append(ticker)
 

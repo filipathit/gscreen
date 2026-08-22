@@ -334,3 +334,79 @@ def test_free_preset_uses_the_only_ci_viable_price_source():
     assert PRESETS["free"] == ("static", "tiingo", "edgar")
     assert PRESETS["free-stooq"] == ("static", "stooq", "edgar")
     assert PRESETS["free-yahoo"] == ("static", "yahoo", "edgar")
+
+
+# --------------------------------------------------------------------------
+# A check that cannot run must not look like a check that passed
+# --------------------------------------------------------------------------
+
+
+def test_missing_fields_are_reported_as_untested():
+    """EDGAR has no EBITDA, so the leverage gate is inert. The output has to
+    say so rather than quietly waving the company through."""
+
+    class NoEbitda(FixtureProvider):
+        def fundamentals(self, ticker, as_of):
+            f = super().fundamentals(ticker, as_of)
+            f.ebitda = None
+            f.short_pct_float = None
+            return f
+
+    result = run_screen(NoEbitda(FIXTURES), "2026-08-15", ScreenConfig())
+    assert result.survivors
+    for row in result.survivors:
+        assert "leverage (no EBITDA)" in row["checks_skipped"]
+        assert "squeeze (no short interest)" in row["checks_skipped"]
+    assert "untested:" in result.summary()
+
+
+def test_require_all_checks_rejects_incomplete_data():
+    class NoEbitda(FixtureProvider):
+        def fundamentals(self, ticker, as_of):
+            f = super().fundamentals(ticker, as_of)
+            f.ebitda = None
+            return f
+
+    strict = run_screen(
+        NoEbitda(FIXTURES), "2026-08-15", ScreenConfig(require_all_checks=True)
+    )
+    assert strict.survivors == []
+    assert any(r.stage == "incomplete" for r in strict.rejections)
+
+
+def test_edgar_falls_back_to_dei_for_share_count():
+    """CRWD reported dilution as n/a because share count lives under dei."""
+    raw = {
+        "entityName": "Dei Only Inc",
+        "facts": {
+            "us-gaap": {
+                "Revenues": {
+                    "units": {
+                        "USD": [
+                            {"start": "2023-01-01", "end": "2023-12-31",
+                             "val": 100, "filed": "2024-02-01", "form": "10-K"},
+                            {"start": "2024-01-01", "end": "2024-12-31",
+                             "val": 150, "filed": "2025-02-01", "form": "10-K"},
+                        ]
+                    }
+                }
+            },
+            "dei": {
+                "EntityCommonStockSharesOutstanding": {
+                    "units": {
+                        "shares": [
+                            {"end": "2023-12-31", "val": 1_000_000,
+                             "filed": "2024-02-01", "form": "10-K"},
+                            {"end": "2024-12-31", "val": 1_050_000,
+                             "filed": "2025-02-01", "form": "10-K"},
+                        ]
+                    }
+                }
+            },
+        },
+    }
+    from gscreen.metrics import share_count_growth
+
+    f = from_edgar("DEIO", raw, "2026-01-01")
+    assert f.annual_shares == [1_000_000, 1_050_000]
+    assert share_count_growth(f.annual_shares) == pytest.approx(0.05)

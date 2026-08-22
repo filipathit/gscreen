@@ -129,8 +129,8 @@ CASH_TAGS = [
 NET_INCOME = "NetIncomeLoss"
 
 
-def _usd_facts(raw: dict, tag: str) -> list[dict]:
-    units = _walk(raw, "facts", "us-gaap", tag, "units") or {}
+def _usd_facts(raw: dict, tag: str, taxonomy: str = "us-gaap") -> list[dict]:
+    units = _walk(raw, "facts", taxonomy, tag, "units") or {}
     for unit_name in ("USD", "shares", "USD/shares"):
         if unit_name in units:
             return units[unit_name]
@@ -205,6 +205,13 @@ def from_edgar(
     }
 
     shares_facts = _first_available(raw, SHARES_TAGS, as_of)
+    if not shares_facts:
+        # Many filers report share count only in the dei taxonomy on the
+        # cover page. Without this, dilution silently came back null.
+        shares_facts = _visible(
+            _usd_facts(raw, "EntityCommonStockSharesOutstanding", taxonomy="dei"),
+            as_of,
+        )
     shares = _latest_per_period([f for f in shares_facts if f.get("end")])
 
     debt_facts = _first_available(raw, DEBT_TAGS, as_of)
