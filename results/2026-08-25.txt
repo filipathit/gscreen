@@ -1,0 +1,17 @@
+sources: universe=StaticUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True  universe_pit=False
+
+Screen as of 2026-08-25: 3 survivors
+  CRWD   cagr3y=  29.0% mom12-1=  55.9% qtrs=22 r40=  56.2% dilution=n/a
+         untested: leverage (no EBITDA), dilution (no share history), squeeze (no short interest), size (no market cap)
+  ANET   cagr3y=  27.1% mom12-1=  49.7% qtrs=18 r40=  75.7% dilution=   0.2%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+  AVGO   cagr3y=  24.4% mom12-1=  33.7% qtrs=8 r40=  66.5% dilution=   0.5%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+Rejected: 7
+  ADBE   [durability] 3y revenue CAGR   10.5% below floor; 0/4 quarters above   15.0% YoY (latest quarter   12.7%)
+  AMD    [durability] 3y revenue CAGR   13.6% below floor
+  CRM    [durability] 3y revenue CAGR    9.8% below floor; 0/4 quarters above   15.0% YoY (latest quarter   13.3%)
+  CRWV   [durability] no 3y revenue history
+  AXON   [momentum] 12-1 momentum  -25.9% below floor
+  CAVA   [momentum] 12-1 momentum  -25.2% below floor
+  APP    [momentum] 12-1 momentum   14.7% below floor
