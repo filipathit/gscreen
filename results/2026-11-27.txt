@@ -1,0 +1,15 @@
+sources: universe=StaticUniverse  prices=TiingoPrices  fundamentals=EdgarFundamentals  point_in_time=True  universe_pit=False
+
+Screen as of 2026-11-27: 1 survivors
+  ANET   cagr3y=  27.1% mom12-1=  21.6% qtrs=19 r40=  75.7% dilution=   0.2%
+         untested: leverage (no EBITDA), squeeze (no short interest), size (no market cap)
+Rejected: 9
+  ADBE   [durability] 3y revenue CAGR   10.5% below floor; 0/4 quarters above   15.0% YoY (latest quarter   12.9%)
+  AMD    [durability] 3y revenue CAGR   13.6% below floor
+  CRM    [durability] 3y revenue CAGR    9.8% below floor; 0/4 quarters above   15.0% YoY (latest quarter   10.8%)
+  CRWV   [durability] no 3y revenue history
+  AXON   [momentum] 12-1 momentum  -42.1% below floor
+  CAVA   [momentum] 12-1 momentum  -18.5% below floor
+  APP    [momentum] 12-1 momentum  -57.6% below floor
+  AVGO   [momentum] 12-1 momentum   -2.6% below floor
+  CRWD   [exclusion] 4d after earnings - reaction, not trend
